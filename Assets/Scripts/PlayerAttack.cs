@@ -20,7 +20,7 @@ public class PlayerAttack : MonoBehaviour
         if (Time.time >= nextAttackTime)
         {
             // Detectar input de ataque (ej. clic izquierdo del mouse)
-            if (Input.GetButtonDown("Fire1")) // "Fire1" usualmente es clic izq o Ctrl izq
+            if (Input.GetKeyDown(KeyCode.Q)) // "Fire1" usualmente es clic izq o Ctrl izq
             {
                 Attack();
                 nextAttackTime = Time.time + 1f / attackRate; // Calcular el próximo tiempo de ataque
