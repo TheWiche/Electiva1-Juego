@@ -2263,6 +2263,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  onDied:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!95 &77755907 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 6982812146204527121, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
@@ -20578,8 +20581,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenu: {fileID: 1985126330}
+  optionsPanel: {fileID: 0}
+  optionsManager: {fileID: 0}
   resumeButton: {fileID: 1110934262}
   quitButton: {fileID: 838081702}
+  optionsButton: {fileID: 0}
 --- !u!4 &746773249
 Transform:
   m_ObjectHideFlags: 0
@@ -57187,6 +57193,56 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2470915096720291200, guid: 194e9111af0c33840a49d573f2b26952, type: 3}
   m_PrefabInstance: {fileID: 1995126959}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2002667450
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2002667452}
+  - component: {fileID: 2002667451}
+  m_Layer: 0
+  m_Name: OptionsManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2002667451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2002667450}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dee430b71e5c8d479b1a96bd051e8fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resolutionDropdown: {fileID: 0}
+  fullscreenToggle: {fileID: 0}
+  volumeSlider: {fileID: 0}
+  pausePanel: {fileID: 0}
+  mainMenuPanel: {fileID: 0}
+  optionsPanel: {fileID: 0}
+--- !u!4 &2002667452
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2002667450}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 356, y: 76.5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2002756158
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -61987,3 +62043,4 @@ SceneRoots:
   - {fileID: 1126476428}
   - {fileID: 746773249}
   - {fileID: 1984240820}
+  - {fileID: 2002667452}
