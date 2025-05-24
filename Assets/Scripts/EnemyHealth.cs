@@ -1,12 +1,12 @@
 using UnityEngine;
+using UnityEngine.AI; // Necesario para deshabilitar NavMeshAgent al morir
 
 public class EnemyHealth : MonoBehaviour
 {
     public int maxHealth = 100;
     public int currentHealth;
 
-    // Opcional: Efecto de muerte, loot, etc.
-    // public GameObject deathEffect;
+    private bool isAlive = true; // Control de vida del enemigo
 
     void Start()
     {
@@ -15,43 +15,43 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (!IsAlive()) // No tomar daño si ya está muerto
-            return;
+        if (!isAlive) return; 
 
         currentHealth -= damage;
-        Debug.Log(gameObject.name + " recibió " + damage + " de daño. Salud restante: " + currentHealth);
+        Debug.Log(gameObject.name + " received " + damage + " damage. Current Health: " + currentHealth);
 
         if (currentHealth <= 0)
         {
-            currentHealth = 0; // Asegurarse que no sea negativo
+            currentHealth = 0; 
             Die();
         }
     }
 
     void Die()
     {
-        Debug.Log(gameObject.name + " murió.");
-        // Aquí puedes instanciar un efecto de muerte, soltar loot, etc.
-        // if (deathEffect != null) Instantiate(deathEffect, transform.position, Quaternion.identity);
+        isAlive = false; 
+        Debug.Log(gameObject.name + " has DIED!");
 
-        // Podrías desactivar componentes en lugar de destruir inmediatamente
-        // si quieres que el NavMeshAgent se detenga correctamente o
-        // si tienes una animación de muerte que necesita reproducirse.
-        // Por ejemplo:
-        // GetComponent<UnityEngine.AI.NavMeshAgent>().enabled = false;
-        // GetComponent<Collider>().enabled = false;
-        // this.enabled = false; // Desactiva este script de salud
-        // GetComponent<EnemyAI>().enabled = false; // Desactiva la IA
+        // Deshabilitar componentes que controlan el movimiento y la lógica del enemigo
+        NavMeshAgent navAgent = GetComponent<NavMeshAgent>();
+        if (navAgent != null) navAgent.enabled = false;
 
-        // Llamar a la destrucción después de un delay si tienes animaciones de muerte
-        Destroy(gameObject, 2f); // Destruir después de 2 segundos (ajusta si tienes anim de muerte)
-                                 // O Destruir inmediatamente si no hay animación de muerte:
-                                 // Destroy(gameObject);
+        EnemyAI enemyAI = GetComponent<EnemyAI>();
+        if (enemyAI != null) enemyAI.enabled = false;
+
+        Collider col = GetComponent<Collider>();
+        if (col != null) col.enabled = false; // Desactiva el collider para que no bloquee
+
+        // Opcional: Desactivar el renderizado
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer != null) meshRenderer.enabled = false;
+        
+        // Destruir el GameObject después de un breve retardo para permitir cualquier efecto
+        Destroy(gameObject, 2f); 
     }
 
-    // --- MÉTODO AÑADIDO ---
     public bool IsAlive()
     {
-        return currentHealth > 0;
+        return isAlive; // Devuelve el estado de vida del enemigo
     }
 }
