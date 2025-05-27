@@ -119,6 +119,12 @@ public class PauseOptionsManager : MonoBehaviour
         LoadSettingsFromPrefs();
     }
 
+    public void StartGame()
+    {
+        Time.timeScale = 1f;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Nivel1");
+    }
+
     #endregion
 
     #region Options Menu
