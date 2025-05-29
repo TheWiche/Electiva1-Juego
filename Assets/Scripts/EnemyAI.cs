@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-[RequireComponent(typeof(EnemyHealth))] 
+[RequireComponent(typeof(EnemyHealth))]
 public class EnemyAI : MonoBehaviour
 {
     [Header("Detection and Movement Settings")]
@@ -15,14 +15,16 @@ public class EnemyAI : MonoBehaviour
     public int damageAmount = 10;
 
     private Transform playerTarget;
+    private PlayerHealth playerHealth;  // Referencia directa a PlayerHealth
     private NavMeshAgent agent;
-    private EnemyHealth enemyHealth; // Ahora es EnemyHealth, no HealthSystem
+    private EnemyHealth enemyHealth;
     private Animator animator;
 
     private int animIDSpeed;
     private bool hasAnimator;
 
     private float lastAttackTime;
+    private bool isAttacking = false;
 
     void Awake()
     {
@@ -31,16 +33,24 @@ public class EnemyAI : MonoBehaviour
         if (playerObject != null)
         {
             playerTarget = playerObject.transform;
+            playerHealth = playerObject.GetComponent<PlayerHealth>();
+
+            if (playerHealth == null)
+            {
+                Debug.LogError("EnemyAI: Player does not have a PlayerHealth component.");
+                enabled = false;
+                return;
+            }
         }
         else
         {
-            Debug.LogError("EnemyAI: Player object with 'Player' tag not found. Please ensure the player has the 'Player' tag.");
+            Debug.LogError("EnemyAI: Player object with 'Player' tag not found.");
             enabled = false;
             return;
         }
 
         agent = GetComponent<NavMeshAgent>();
-        enemyHealth = GetComponent<EnemyHealth>(); // Obtenemos EnemyHealth
+        enemyHealth = GetComponent<EnemyHealth>();
         hasAnimator = TryGetComponent(out animator);
 
         if (hasAnimator && animator != null)
@@ -50,15 +60,16 @@ public class EnemyAI : MonoBehaviour
 
         if (agent != null)
         {
-            agent.stoppingDistance = this.stoppingDistance; 
+            agent.stoppingDistance = stoppingDistance;
         }
 
-        lastAttackTime = -attackCooldown; 
+        lastAttackTime = -attackCooldown;
     }
 
     void Update()
     {
-        if (playerTarget == null || (enemyHealth != null && !enemyHealth.IsAlive())) // Usa IsAlive() de EnemyHealth
+        // Si el jugador no existe o está muerto, o el enemigo está muerto, detener todo
+        if (playerTarget == null || playerHealth == null || !playerHealth.IsAlive || (enemyHealth != null && !enemyHealth.IsAlive()))
         {
             if (agent != null && agent.isOnNavMesh && agent.isActiveAndEnabled)
             {
@@ -72,7 +83,17 @@ public class EnemyAI : MonoBehaviour
             }
             return;
         }
-        
+
+        // Mientras está atacando, no mover al agente ni buscar al jugador
+        if (isAttacking)
+        {
+            if (agent != null && !agent.isStopped)
+            {
+                agent.isStopped = true;
+            }
+            return;
+        }
+
         float distanceToPlayer = Vector3.Distance(playerTarget.position, transform.position);
 
         if (distanceToPlayer <= lookRadius)
@@ -80,15 +101,15 @@ public class EnemyAI : MonoBehaviour
             if (agent.isOnNavMesh && agent.isActiveAndEnabled)
             {
                 agent.SetDestination(playerTarget.position);
-                if (agent.isStopped) agent.isStopped = false; 
+                if (agent.isStopped) agent.isStopped = false;
             }
 
-            if (distanceToPlayer <= agent.stoppingDistance + 0.5f) 
+            if (distanceToPlayer <= agent.stoppingDistance + 0.5f)
             {
                 FaceTarget();
             }
         }
-        else 
+        else
         {
             if (agent.isOnNavMesh && agent.isActiveAndEnabled)
             {
@@ -103,6 +124,7 @@ public class EnemyAI : MonoBehaviour
             {
                 AttackPlayer();
                 lastAttackTime = Time.time;
+                isAttacking = true; // Bloquea el movimiento mientras ataca
             }
         }
 
@@ -122,26 +144,56 @@ public class EnemyAI : MonoBehaviour
 
     void AttackPlayer()
     {
-        Debug.Log("Enemy attacked the player!");
+        Debug.Log("Enemy attack animation triggered.");
 
-        PlayerHealth playerHealth = playerTarget.GetComponent<PlayerHealth>();
+        if (hasAnimator && animator != null)
+        {
+            animator.SetTrigger("Attack");
+        }
+    }
 
-        if (playerHealth != null)
+    // Este método debe ser llamado desde un evento en la animación de ataque justo en el frame del golpe
+    public void ApplyDamageToPlayer()
+    {
+        if (playerTarget == null || playerHealth == null) return;
+
+        // Verificamos distancia justo al momento de aplicar daño
+        float distanceToPlayer = Vector3.Distance(playerTarget.position, transform.position);
+        if (distanceToPlayer > attackRange)
+        {
+            Debug.Log("Enemy attack missed: player out of range.");
+            // Permitimos que el enemigo termine el ataque sin hacer daño
+            isAttacking = false;
+            if (agent != null)
+            {
+                agent.isStopped = false;
+            }
+            return;
+        }
+
+        if (playerHealth.IsAlive)
         {
             playerHealth.TakeDamage(damageAmount);
+            Debug.Log("Enemy dealt damage to the player.");
         }
         else
         {
-            Debug.LogWarning("EnemyAI: Player does not have a PlayerHealth component. Cannot apply damage.");
+            Debug.Log("Enemy tried to damage player, but player is already dead.");
+        }
+
+        isAttacking = false;
+        if (agent != null)
+        {
+            agent.isStopped = false;
         }
     }
 
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, lookRadius); 
+        Gizmos.DrawWireSphere(transform.position, lookRadius);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange); 
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
