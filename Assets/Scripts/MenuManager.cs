@@ -86,11 +86,11 @@ public class MenuManager : MonoBehaviour
         int savedHeight = PlayerPrefs.GetInt("resolutionHeight", Screen.currentResolution.height);
         int matchedIndex = 0;
 
-        for (int i = 0; i < Screen.resolutions.Length; i++)
+        foreach (Resolution res in Screen.resolutions)
         {
-            Resolution res = Screen.resolutions[i];
-
-            if (!filteredResolutions.Exists(r => r.width == res.width && r.height == res.height))
+            // Solo agregamos si no hay ya una resolución con ese ancho y alto
+            bool alreadyExists = filteredResolutions.Exists(r => r.width == res.width && r.height == res.height);
+            if (!alreadyExists)
             {
                 filteredResolutions.Add(res);
                 options.Add(res.width + "x" + res.height);
@@ -101,6 +101,7 @@ public class MenuManager : MonoBehaviour
                 }
             }
         }
+
 
         resolutionDropdown.AddOptions(options);
         resolutionDropdown.value = matchedIndex;
