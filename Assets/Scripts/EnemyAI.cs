@@ -9,42 +9,39 @@ public class EnemyAI : MonoBehaviour
     public float lookRadius = 15f;
     public float stoppingDistance = 1.5f;
 
+    [Header("Player Reference")]
+    public Transform playerTarget;  // 🔴 Se asigna manualmente en el Inspector
+
     [Header("Attack Settings")]
     public float attackRange = 2.0f;
     public float attackCooldown = 2.0f;
     public int damageAmount = 10;
 
-    private Transform playerTarget;
-    private PlayerHealth playerHealth;  // Referencia directa a PlayerHealth
+    private PlayerHealth playerHealth;
     private NavMeshAgent agent;
     private EnemyHealth enemyHealth;
     private Animator animator;
 
     private int animIDSpeed;
     private bool hasAnimator;
-
     private float lastAttackTime;
     private bool isAttacking = false;
 
     void Awake()
     {
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-
-        if (playerObject != null)
+        // 🔴 Verificación manual del jugador
+        if (playerTarget == null)
         {
-            playerTarget = playerObject.transform;
-            playerHealth = playerObject.GetComponent<PlayerHealth>();
-
-            if (playerHealth == null)
-            {
-                Debug.LogError("EnemyAI: Player does not have a PlayerHealth component.");
-                enabled = false;
-                return;
-            }
+            Debug.LogError("EnemyAI: No se ha asignado manualmente un jugador en el Inspector.");
+            enabled = false;
+            return;
         }
-        else
+
+        playerHealth = playerTarget.GetComponent<PlayerHealth>();
+
+        if (playerHealth == null)
         {
-            Debug.LogError("EnemyAI: Player object with 'Player' tag not found.");
+            Debug.LogError("EnemyAI: El jugador no tiene componente PlayerHealth.");
             enabled = false;
             return;
         }
@@ -68,29 +65,15 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        // Si el jugador no existe o está muerto, o el enemigo está muerto, detener todo
-        if (playerTarget == null || playerHealth == null || !playerHealth.IsAlive || (enemyHealth != null && !enemyHealth.IsAlive()))
+        if (!CanAct()) 
         {
-            if (agent != null && agent.isOnNavMesh && agent.isActiveAndEnabled)
-            {
-                if (!agent.isStopped) agent.isStopped = true;
-                if (agent.hasPath) agent.ResetPath();
-            }
-
-            if (hasAnimator && animator != null)
-            {
-                animator.SetFloat(animIDSpeed, 0);
-            }
+            StopMovement();
             return;
         }
 
-        // Mientras está atacando, no mover al agente ni buscar al jugador
-        if (isAttacking)
+        if (isAttacking) 
         {
-            if (agent != null && !agent.isStopped)
-            {
-                agent.isStopped = true;
-            }
+            agent.isStopped = true;
             return;
         }
 
@@ -98,76 +81,94 @@ public class EnemyAI : MonoBehaviour
 
         if (distanceToPlayer <= lookRadius)
         {
-            if (agent.isOnNavMesh && agent.isActiveAndEnabled)
-            {
-                agent.SetDestination(playerTarget.position);
-                if (agent.isStopped) agent.isStopped = false;
-            }
-
-            if (distanceToPlayer <= agent.stoppingDistance + 0.5f)
-            {
-                FaceTarget();
-            }
+            MoveTowardsPlayer(distanceToPlayer);
         }
         else
         {
-            if (agent.isOnNavMesh && agent.isActiveAndEnabled)
-            {
-                if (!agent.isStopped) agent.isStopped = true;
-                if (agent.hasPath) agent.ResetPath();
-            }
+            StopMovement();
         }
 
-        if (distanceToPlayer <= attackRange)
+        if (distanceToPlayer <= attackRange && Time.time >= lastAttackTime + attackCooldown)
         {
-            if (Time.time >= lastAttackTime + attackCooldown)
-            {
-                AttackPlayer();
-                lastAttackTime = Time.time;
-                isAttacking = true; // Bloquea el movimiento mientras ataca
-            }
+            StartAttack();
         }
 
-        if (hasAnimator && animator != null && agent != null && agent.isOnNavMesh)
+        UpdateAnimatorSpeed();
+    }
+
+    private bool CanAct()
+    {
+        return playerTarget != null 
+            && playerHealth != null 
+            && playerHealth.IsAlive 
+            && enemyHealth != null 
+            && enemyHealth.IsAlive();
+    }
+
+    private void MoveTowardsPlayer(float distanceToPlayer)
+    {
+        if (!agent.isOnNavMesh) return;
+
+        agent.SetDestination(playerTarget.position);
+        agent.isStopped = false;
+
+        if (distanceToPlayer <= agent.stoppingDistance + 0.5f)
         {
-            float speedPercent = agent.velocity.magnitude / agent.speed;
-            animator.SetFloat(animIDSpeed, speedPercent, 0.1f, Time.deltaTime);
+            FaceTarget();
         }
     }
 
-    void FaceTarget()
+    private void StopMovement()
+    {
+        if (agent.isOnNavMesh)
+        {
+            if (!agent.isStopped) agent.isStopped = true;
+            if (agent.hasPath) agent.ResetPath();
+        }
+
+        if (hasAnimator)
+        {
+            animator.SetFloat(animIDSpeed, 0, 0.1f, Time.deltaTime);
+        }
+    }
+
+    private void FaceTarget()
     {
         Vector3 direction = (playerTarget.position - transform.position).normalized;
         Quaternion lookRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
         transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
     }
 
-    void AttackPlayer()
+    private void StartAttack()
     {
-        Debug.Log("Enemy attack animation triggered.");
+        isAttacking = true;
+        lastAttackTime = Time.time;
+        agent.isStopped = true;
 
-        if (hasAnimator && animator != null)
+        if (hasAnimator)
         {
             animator.SetTrigger("Attack");
         }
+        else
+        {
+            ApplyDamageToPlayer();
+        }
     }
 
-    // Este método debe ser llamado desde un evento en la animación de ataque justo en el frame del golpe
     public void ApplyDamageToPlayer()
     {
-        if (playerTarget == null || playerHealth == null) return;
+        if (playerTarget == null || playerHealth == null) 
+        {
+            EndAttack();
+            return;
+        }
 
-        // Verificamos distancia justo al momento de aplicar daño
         float distanceToPlayer = Vector3.Distance(playerTarget.position, transform.position);
+
         if (distanceToPlayer > attackRange)
         {
             Debug.Log("Enemy attack missed: player out of range.");
-            // Permitimos que el enemigo termine el ataque sin hacer daño
-            isAttacking = false;
-            if (agent != null)
-            {
-                agent.isStopped = false;
-            }
+            EndAttack();
             return;
         }
 
@@ -181,10 +182,24 @@ public class EnemyAI : MonoBehaviour
             Debug.Log("Enemy tried to damage player, but player is already dead.");
         }
 
+        EndAttack();
+    }
+
+    private void EndAttack()
+    {
         isAttacking = false;
-        if (agent != null)
+        if (agent.isOnNavMesh)
         {
             agent.isStopped = false;
+        }
+    }
+
+    private void UpdateAnimatorSpeed()
+    {
+        if (hasAnimator && agent.isOnNavMesh)
+        {
+            float speedPercent = agent.velocity.magnitude / agent.speed;
+            animator.SetFloat(animIDSpeed, speedPercent, 0.1f, Time.deltaTime);
         }
     }
 

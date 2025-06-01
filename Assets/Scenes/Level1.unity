@@ -2605,6 +2605,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lookRadius: 15
   stoppingDistance: 1.5
+  playerTarget: {fileID: 77755897}
   attackRange: 2
   attackCooldown: 2
   damageAmount: 10
@@ -43685,6 +43686,22 @@ PrefabInstance:
       propertyPath: m_Follow
       value: 
       objectReference: {fileID: 77755898}
+    - target: {fileID: 2070925441746177913, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+      propertyPath: Priority.Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2070925441746177913, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+      propertyPath: Priority.m_Value
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2070925441746177913, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+      propertyPath: m_LegacyPriority
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2070925441746177913, guid: a1a802ecaf6775746bb2a929fb554ad8, type: 3}
+      propertyPath: m_StreamingVersion
+      value: 20241001
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -47182,7 +47199,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: f466529bb9398c3419dbc27cb18d828a, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: a5b51fef450db9d43a5ec4866c63f4cd, type: 2}
   m_BuildHeightMesh: 0
 --- !u!1001 &1905223747
 PrefabInstance:
@@ -49820,7 +49837,7 @@ GameObject:
   - component: {fileID: 2005143585}
   m_Layer: 0
   m_Name: Jugador
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
