@@ -9831,7 +9831,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -19722,7 +19722,7 @@ GameObject:
   m_Component:
   - component: {fileID: 857515383}
   m_Layer: 0
-  m_Name: mapa1
+  m_Name: Mapa
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48959,10 +48959,10 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 819004531}
   - {fileID: 165891326}
   - {fileID: 857515383}
-  - {fileID: 2005143585}
   - {fileID: 415854371}
-  - {fileID: 819004531}
+  - {fileID: 2005143585}
   - {fileID: 82038598}
   - {fileID: 1915039725}
