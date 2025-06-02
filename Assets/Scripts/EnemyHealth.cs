@@ -32,6 +32,12 @@ public class EnemyHealth : MonoBehaviour
         isAlive = false; 
         Debug.Log(gameObject.name + " has DIED!");
 
+        // Notificar al WaveManager que un enemigo ha muerto
+        if (WaveManager.instance != null)
+        {
+            WaveManager.instance.EnemyDied();
+        }
+
         // Deshabilitar componentes que controlan el movimiento y la lógica del enemigo
         NavMeshAgent navAgent = GetComponent<NavMeshAgent>();
         if (navAgent != null) navAgent.enabled = false;
