@@ -9,7 +9,7 @@ public class EnemyAI : MonoBehaviour
     public float lookRadius = 15f;
     public float stoppingDistance = 1.5f;
 
-    [Header("Player Reference")]
+    [Header("Player Reference (Lo encuentra automaticamente)")]
     public Transform playerTarget;  // 🔴 Se asigna manualmente en el Inspector
 
     [Header("Attack Settings")]
@@ -29,21 +29,31 @@ public class EnemyAI : MonoBehaviour
 
     void Awake()
     {
-        // 🔴 Verificación manual del jugador
+        // 🔁 Asignar automáticamente el jugador si no fue asignado manualmente
         if (playerTarget == null)
         {
-            Debug.LogError("EnemyAI: No se ha asignado manualmente un jugador en el Inspector.");
-            enabled = false;
-            return;
+            GameObject playerObj = GameObject.FindObjectOfType<PlayerHealth>()?.gameObject;
+            if (playerObj != null)
+            {
+                playerTarget = playerObj.transform;
+                playerHealth = playerObj.GetComponent<PlayerHealth>();
+            }
+            else
+            {
+                Debug.LogError("EnemyAI: No se encontró ningún objeto con PlayerHealth en la escena.");
+                enabled = false;
+                return;
+            }
         }
-
-        playerHealth = playerTarget.GetComponent<PlayerHealth>();
-
-        if (playerHealth == null)
+        else
         {
-            Debug.LogError("EnemyAI: El jugador no tiene componente PlayerHealth.");
-            enabled = false;
-            return;
+            playerHealth = playerTarget.GetComponent<PlayerHealth>();
+            if (playerHealth == null)
+            {
+                Debug.LogError("EnemyAI: El jugador asignado no tiene componente PlayerHealth.");
+                enabled = false;
+                return;
+            }
         }
 
         agent = GetComponent<NavMeshAgent>();
@@ -62,6 +72,7 @@ public class EnemyAI : MonoBehaviour
 
         lastAttackTime = -attackCooldown;
     }
+
 
     void Update()
     {

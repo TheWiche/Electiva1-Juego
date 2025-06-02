@@ -1,25 +1,42 @@
 using UnityEngine;
-using UnityEngine.AI; // Necesario para deshabilitar NavMeshAgent al morir
-using UnityEngine.UI; // Necesario para acceder a UI (opcional si usas Canvas)
+using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class EnemyHealth : MonoBehaviour
 {
+    [Header("Salud")]
     public int maxHealth = 100;
     public int currentHealth;
 
-    private bool isAlive = true; // Control de vida del enemigo
+    private bool isAlive = true;
 
-    private Canvas healthCanvas; // Referencia a la barra de vida
+    [Header("UI")]
+    public Canvas healthCanvas;         // Referencia al Canvas hijo con la barra de vida
+    public Slider healthSlider;         // Referencia al Slider de vida
 
     void Start()
     {
         currentHealth = maxHealth;
 
-        // Buscar el canvas hijo (barra de vida)
-        healthCanvas = GetComponentInChildren<Canvas>();
-
+        // Activar el canvas si está presente
         if (healthCanvas != null)
-            healthCanvas.gameObject.SetActive(true); // Mostrar desde el inicio o cuando recibe daño
+            healthCanvas.gameObject.SetActive(true);
+
+        // Configurar el slider si está asignado
+        if (healthSlider != null)
+        {
+            healthSlider.maxValue = maxHealth;
+            healthSlider.value = currentHealth;
+        }
+    }
+
+    void Update()
+    {
+        // Prueba manual: tecla T le hace daño al enemigo
+        if (Input.GetKeyDown(KeyCode.T))
+        {
+            TakeDamage(10);
+        }
     }
 
     public void TakeDamage(int damage)
@@ -27,15 +44,19 @@ public class EnemyHealth : MonoBehaviour
         if (!isAlive) return;
 
         currentHealth -= damage;
+        currentHealth = Mathf.Max(0, currentHealth); // Evita que baje de 0
         Debug.Log(gameObject.name + " received " + damage + " damage. Current Health: " + currentHealth);
 
-        // Mostrar la barra de vida si estaba oculta (opcional)
+        // Mostrar la barra si estaba oculta (opcional)
         if (healthCanvas != null && !healthCanvas.gameObject.activeSelf)
             healthCanvas.gameObject.SetActive(true);
 
+        // Actualizar el slider
+        if (healthSlider != null)
+            healthSlider.value = currentHealth;
+
         if (currentHealth <= 0)
         {
-            currentHealth = 0;
             Die();
         }
     }
@@ -45,13 +66,13 @@ public class EnemyHealth : MonoBehaviour
         isAlive = false;
         Debug.Log(gameObject.name + " has DIED!");
 
-        // Notificar al WaveManager que un enemigo ha muerto
+        // Notificar al WaveManager si existe
         if (WaveManager.instance != null)
         {
             WaveManager.instance.EnemyDied();
         }
 
-        // Deshabilitar componentes que controlan el movimiento y la lógica del enemigo
+        // Desactivar IA, movimiento y colisión
         NavMeshAgent navAgent = GetComponent<NavMeshAgent>();
         if (navAgent != null) navAgent.enabled = false;
 
@@ -64,11 +85,11 @@ public class EnemyHealth : MonoBehaviour
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer != null) meshRenderer.enabled = false;
 
-        // Ocultar la barra de vida al morir
+        // Ocultar la barra de vida
         if (healthCanvas != null)
             healthCanvas.gameObject.SetActive(false);
 
-        // Destruir el GameObject después de un breve retardo
+        // Destruir el objeto tras un retardo
         Destroy(gameObject, 2f);
     }
 
