@@ -1,5 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
+<<<<<<< HEAD
+=======
+using UnityEngine.SceneManagement;
+>>>>>>> origin/dev/Nelson
 using System.Collections.Generic;
 
 public class MenuManager : MonoBehaviour
@@ -12,34 +16,60 @@ public class MenuManager : MonoBehaviour
     public Toggle fullscreenToggle;
     public Slider volumeSlider;
 
+<<<<<<< HEAD
     private Resolution[] availableResolutions;
     private int pendingResolutionIndex;
     private bool pendingFullscreen;
     private float pendingVolume;
+=======
+    private List<Resolution> filteredResolutions = new List<Resolution>();
+>>>>>>> origin/dev/Nelson
 
     void Start()
     {
         ShowMainMenu();
+<<<<<<< HEAD
         PopulateResolutionDropdown();
         LoadSettingsIntoUI();
         SettingsManager.ApplySavedSettings();
+=======
+        PopulateResolutionDropdown(); // Esto debe ejecutarse antes
+        SetupUIListeners();           // Luego conectamos eventos
+        LoadSettingsIntoUI();        // Ahora cargamos
+        ApplyCurrentSettings();      // Finalmente aplicamos
+>>>>>>> origin/dev/Nelson
     }
+
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (optionsPanel.activeSelf)
+<<<<<<< HEAD
             {
                 BackFromOptions();
             }
             else if (creditsPanel != null && creditsPanel.activeSelf)
             {
+=======
+                BackFromOptions();
+            else if (creditsPanel != null && creditsPanel.activeSelf)
+>>>>>>> origin/dev/Nelson
                 ShowMainMenu();
-            }
         }
     }
 
+<<<<<<< HEAD
+=======
+    private void SetupUIListeners()
+    {
+        resolutionDropdown.onValueChanged.AddListener(OnResolutionChanged);
+        fullscreenToggle.onValueChanged.AddListener(OnFullscreenChanged);
+        volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+    }
+
+>>>>>>> origin/dev/Nelson
     public void ShowMainMenu()
     {
         mainMenuPanel.SetActive(true);
@@ -70,11 +100,16 @@ public class MenuManager : MonoBehaviour
     public void StartGame()
     {
         Time.timeScale = 1f;
+<<<<<<< HEAD
         UnityEngine.SceneManagement.SceneManager.LoadScene("Level1");
+=======
+        SceneManager.LoadScene("Nivel1");
+>>>>>>> origin/dev/Nelson
     }
 
     private void PopulateResolutionDropdown()
     {
+<<<<<<< HEAD
         availableResolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
 
@@ -133,9 +168,45 @@ public class MenuManager : MonoBehaviour
     {
         pendingVolume = volume;
     }
+=======
+        resolutionDropdown.ClearOptions();
+        filteredResolutions.Clear();
+        List<string> options = new List<string>();
 
-    public void ApplyChanges()
+        int savedWidth = PlayerPrefs.GetInt("resolutionWidth", Screen.currentResolution.width);
+        int savedHeight = PlayerPrefs.GetInt("resolutionHeight", Screen.currentResolution.height);
+        int matchedIndex = 0;
+
+        foreach (Resolution res in Screen.resolutions)
+        {
+            // Solo agregamos si no hay ya una resolución con ese ancho y alto
+            bool alreadyExists = filteredResolutions.Exists(r => r.width == res.width && r.height == res.height);
+            if (!alreadyExists)
+            {
+                filteredResolutions.Add(res);
+                options.Add(res.width + "x" + res.height);
+
+                if (res.width == savedWidth && res.height == savedHeight)
+                {
+                    matchedIndex = filteredResolutions.Count - 1;
+                }
+            }
+        }
+
+
+        resolutionDropdown.AddOptions(options);
+        resolutionDropdown.value = matchedIndex;
+        resolutionDropdown.RefreshShownValue();
+
+        // Guardamos el índice válido también
+        PlayerPrefs.SetInt("resolutionIndex", matchedIndex);
+    }
+
+>>>>>>> origin/dev/Nelson
+
+    private void LoadSettingsIntoUI()
     {
+<<<<<<< HEAD
         SettingsManager.SaveSettings(pendingResolutionIndex, pendingFullscreen, pendingVolume);
         SettingsManager.ApplySavedSettings();
     }
@@ -148,3 +219,62 @@ public class MenuManager : MonoBehaviour
         LoadSettingsIntoUI();
     }
 }
+=======
+        int resolutionIndex = PlayerPrefs.GetInt("resolutionIndex", 0);
+        resolutionDropdown.value = Mathf.Clamp(resolutionIndex, 0, filteredResolutions.Count - 1);
+        fullscreenToggle.isOn = PlayerPrefs.GetInt("fullscreen", 1) == 1;
+        volumeSlider.value = PlayerPrefs.GetFloat("volume", 1f);
+    }
+
+    private void ApplyCurrentSettings()
+    {
+        int resolutionIndex = PlayerPrefs.GetInt("resolutionIndex", 0);
+        bool isFullscreen = PlayerPrefs.GetInt("fullscreen", 1) == 1;
+        float volume = PlayerPrefs.GetFloat("volume", 1f);
+
+        ApplyResolution(resolutionIndex, isFullscreen);
+        Screen.fullScreen = isFullscreen;
+        AudioListener.volume = volume;
+    }
+
+    public void OnResolutionChanged(int index)
+    {
+        PlayerPrefs.SetInt("resolutionIndex", index);
+        PlayerPrefs.SetInt("resolutionWidth", filteredResolutions[index].width);
+        PlayerPrefs.SetInt("resolutionHeight", filteredResolutions[index].height);
+        PlayerPrefs.Save();
+        ApplyResolution(index, fullscreenToggle.isOn);
+    }
+
+    public void OnFullscreenChanged(bool isFullscreen)
+    {
+        PlayerPrefs.SetInt("fullscreen", isFullscreen ? 1 : 0);
+        PlayerPrefs.Save();
+        Screen.fullScreen = isFullscreen;
+        ApplyResolution(resolutionDropdown.value, isFullscreen);
+    }
+
+    public void OnVolumeChanged(float volume)
+    {
+        PlayerPrefs.SetFloat("volume", volume);
+        PlayerPrefs.Save();
+        AudioListener.volume = volume;
+    }
+
+    private void ApplyResolution(int index, bool fullscreen)
+    {
+        if (index >= 0 && index < filteredResolutions.Count)
+        {
+            Resolution selected = filteredResolutions[index];
+            Screen.SetResolution(selected.width, selected.height, fullscreen);
+        }
+    }
+
+    public void BackFromOptions()
+    {
+        optionsPanel.SetActive(false);
+        mainMenuPanel.SetActive(true);
+        LoadSettingsIntoUI();
+    }
+}
+>>>>>>> origin/dev/Nelson
