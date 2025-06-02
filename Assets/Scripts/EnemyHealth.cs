@@ -7,22 +7,22 @@ public class EnemyHealth : MonoBehaviour
     [Header("Salud")]
     public int maxHealth = 100;
     public int currentHealth;
-
     private bool isAlive = true;
 
     [Header("UI")]
-    public Canvas healthCanvas;         // Referencia al Canvas hijo con la barra de vida
-    public Slider healthSlider;         // Referencia al Slider de vida
+    public Canvas healthCanvas;
+    public Slider healthSlider;
+
+    [Header("Animación")]
+    public Animator animator;
 
     void Start()
     {
         currentHealth = maxHealth;
 
-        // Activar el canvas si está presente
         if (healthCanvas != null)
             healthCanvas.gameObject.SetActive(true);
 
-        // Configurar el slider si está asignado
         if (healthSlider != null)
         {
             healthSlider.maxValue = maxHealth;
@@ -32,7 +32,6 @@ public class EnemyHealth : MonoBehaviour
 
     void Update()
     {
-        // Prueba manual: tecla T le hace daño al enemigo
         if (Input.GetKeyDown(KeyCode.T))
         {
             TakeDamage(10);
@@ -44,14 +43,12 @@ public class EnemyHealth : MonoBehaviour
         if (!isAlive) return;
 
         currentHealth -= damage;
-        currentHealth = Mathf.Max(0, currentHealth); // Evita que baje de 0
+        currentHealth = Mathf.Max(0, currentHealth);
         Debug.Log(gameObject.name + " received " + damage + " damage. Current Health: " + currentHealth);
 
-        // Mostrar la barra si estaba oculta (opcional)
         if (healthCanvas != null && !healthCanvas.gameObject.activeSelf)
             healthCanvas.gameObject.SetActive(true);
 
-        // Actualizar el slider
         if (healthSlider != null)
             healthSlider.value = currentHealth;
 
@@ -66,7 +63,6 @@ public class EnemyHealth : MonoBehaviour
         isAlive = false;
         Debug.Log(gameObject.name + " has DIED!");
 
-        // Notificar al WaveManager si existe
         if (WaveManager.instance != null)
         {
             WaveManager.instance.EnemyDied();
@@ -82,15 +78,33 @@ public class EnemyHealth : MonoBehaviour
         Collider col = GetComponent<Collider>();
         if (col != null) col.enabled = false;
 
-        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
-        if (meshRenderer != null) meshRenderer.enabled = false;
+        // Activar animación de muerte aleatoria con triggers
+        if (animator != null)
+        {
+            int randomIndex = Random.Range(1, 4); // 1, 2, 3
+            string triggerName = "Die_" + randomIndex;
+            animator.SetTrigger(triggerName);
+
+            //StartCoroutine(DisableAnimatorAfterDelay(2f)); // Ajusta según duración de la animación
+        }
+        else
+        {
+            Debug.LogWarning("Animator no asignado en EnemyHealth.");
+        }
 
         // Ocultar la barra de vida
         if (healthCanvas != null)
             healthCanvas.gameObject.SetActive(false);
 
-        // Destruir el objeto tras un retardo
-        Destroy(gameObject, 2f);
+        // Destruir después de un retardo
+        Destroy(gameObject, 10f);
+    }
+
+    private System.Collections.IEnumerator DisableAnimatorAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        if (animator != null)
+            animator.enabled = false;
     }
 
     public bool IsAlive()
