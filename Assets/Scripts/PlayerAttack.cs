@@ -10,11 +10,15 @@ public class PlayerAttack : MonoBehaviour
     public float attackRate = 2f;
     private float nextAttackTime = 0f;
 
-    private int[] attackDamages = new int[] { 15, 20, 30 }; // Daño por animación
+    public bool canAttack = true; // 👈 NUEVO
+
+    private int[] attackDamages = new int[] { 15, 20, 30 };
     private int currentAttackIndex;
 
     void Update()
     {
+        if (!canAttack) return; // 👈 BLOQUEO DE ATAQUE
+
         if (Time.time >= nextAttackTime)
         {
             if (Input.GetKeyDown(KeyCode.Q) || Input.GetMouseButtonDown(0))
@@ -27,7 +31,9 @@ public class PlayerAttack : MonoBehaviour
 
     void Attack()
     {
-        currentAttackIndex = Random.Range(0, 2); // 0, 1 
+        if (!canAttack) return;  // Bloqueo adicional para que no se dispare la animación si no puede atacar
+
+        currentAttackIndex = Random.Range(0, 2);
         animator.SetInteger("AttackIndex", currentAttackIndex);
         animator.SetTrigger("AttackTrigger");
     }
@@ -38,21 +44,16 @@ public class PlayerAttack : MonoBehaviour
 
         foreach (Collider enemyCollider in hitEnemies)
         {
-            // 1. Verificar si el enemigo tiene EnemyHealth
             EnemyHealth enemyHealth = enemyCollider.GetComponent<EnemyHealth>();
             if (enemyHealth == null || !enemyHealth.IsAlive()) continue;
 
-            // 2. Verificar que el enemigo esté realmente cerca (usando el centro del jugador)
             float realDistance = Vector3.Distance(transform.position, enemyCollider.transform.position);
             if (realDistance > attackRange + 0.5f) continue;
 
-            // 3. Verificar que esté en la dirección frontal del jugador
             Vector3 dirToEnemy = (enemyCollider.transform.position - transform.position).normalized;
-            float dot = Vector3.Dot(transform.forward, dirToEnemy); // 1 = delante, 0 = lado, -1 = detrás
+            float dot = Vector3.Dot(transform.forward, dirToEnemy);
+            if (dot < 0.3f) continue;
 
-            if (dot < 0.3f) continue; // Solo enemigos al frente (~72° de ángulo)
-
-            // 4. Aplicar daño
             Debug.Log("Hit: " + enemyCollider.name);
             enemyHealth.TakeDamage(attackDamages[currentAttackIndex]);
         }
@@ -64,4 +65,12 @@ public class PlayerAttack : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
+
+    // 👇 MÉTODO PARA REACTIVAR ATAQUE DESDE LA ANIMACIÓN
+    public void EnableAttack()
+    {
+        canAttack = true;
+        Debug.Log("Ataque habilitado desde animación");
+    }
+
 }

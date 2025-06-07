@@ -9,16 +9,13 @@ public class PlayerHealth : HealthSystem
     [Header("Scripts a Desactivar al Morir")]
     public MonoBehaviour[] scriptsToDisable;
 
-    public void TakeDamage(int amount)
-    {
-        base.TakeDamage((float)amount);
-        Debug.Log("Player received " + amount + " DAMAGE from Enemy. Remaining Health: " + currentHealth);
-    }
+    public PlayerAttack playerAttack; // 👈 REFERENCIA AL SCRIPT DE ATAQUE
 
     public override void TakeDamage(float amount)
     {
         base.TakeDamage(amount);
         Debug.Log("Player received " + amount + " FLOAT DAMAGE. Remaining Health: " + currentHealth);
+        PlayRandomHurtAnimation();
     }
 
     public override void Heal(float amount)
@@ -27,19 +24,34 @@ public class PlayerHealth : HealthSystem
         Debug.Log("Player healed " + amount + ". Current Health: " + currentHealth);
     }
 
+    private void PlayRandomHurtAnimation()
+    {
+        if (animator == null || !IsAlive) return;
+
+        int randomIndex = Random.Range(1, 3); // genera 1 o 2
+        string triggerName = "Hurt_" + randomIndex;
+
+        // BLOQUEAMOS el ataque justo antes de activar la animación de daño
+        PlayerAttack playerAttack = GetComponent<PlayerAttack>();
+        if (playerAttack != null)
+            playerAttack.canAttack = false;
+
+        animator.SetTrigger(triggerName);
+        Debug.Log("Reproduciendo animación de daño: " + triggerName);
+    }
+
+
     protected override void Die()
     {
         base.Die();
         Debug.Log("Player has DIED! Game Over.");
 
-        // Desactivar control del jugador
         foreach (var script in scriptsToDisable)
         {
             if (script != null)
                 script.enabled = false;
         }
 
-        // Activar animación de muerte
         if (animator != null)
         {
             animator.SetTrigger("Die");
@@ -49,7 +61,6 @@ public class PlayerHealth : HealthSystem
             Debug.LogWarning("Animator no asignado en PlayerHealth.");
         }
 
-        // Mostrar pantalla de Game Over
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
@@ -59,7 +70,6 @@ public class PlayerHealth : HealthSystem
             Debug.LogWarning("GameOverPanel no asignado en PlayerHealth.");
         }
 
-        // Mostrar cursor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
