@@ -13,6 +13,12 @@ public class MenuManager : MonoBehaviour
     public Toggle fullscreenToggle;
     public Slider volumeSlider;
 
+    [Header("Dificultad")]
+    public Toggle toggleFacil;
+    public Toggle toggleNormal;
+    public Toggle toggleDificil;
+
+
     private List<Resolution> filteredResolutions = new List<Resolution>();
 
     void Start()
@@ -22,6 +28,7 @@ public class MenuManager : MonoBehaviour
         SetupUIListeners();           // Luego conectamos eventos
         LoadSettingsIntoUI();        // Ahora cargamos
         ApplyCurrentSettings();      // Finalmente aplicamos
+        SetupDifficultyToggles();
     }
 
 
@@ -170,4 +177,26 @@ public class MenuManager : MonoBehaviour
         mainMenuPanel.SetActive(true);
         LoadSettingsIntoUI();
     }
+
+    private void SetupDifficultyToggles()
+    {
+        // Leer dificultad guardada
+        int dificultadGuardada = PlayerPrefs.GetInt("GameDifficulty", 1); // 0=Fácil, 1=Normal, 2=Difícil
+
+        toggleFacil.isOn = (dificultadGuardada == 0);
+        toggleNormal.isOn = (dificultadGuardada == 1);
+        toggleDificil.isOn = (dificultadGuardada == 2);
+
+        toggleFacil.onValueChanged.AddListener((isOn) => { if (isOn) SetDifficulty(0); });
+        toggleNormal.onValueChanged.AddListener((isOn) => { if (isOn) SetDifficulty(1); });
+        toggleDificil.onValueChanged.AddListener((isOn) => { if (isOn) SetDifficulty(2); });
+    }
+
+    private void SetDifficulty(int difficulty)
+    {
+        PlayerPrefs.SetInt("GameDifficulty", difficulty);
+        PlayerPrefs.Save();
+        Debug.Log("Dificultad seleccionada: " + (difficulty == 0 ? "Fácil" : difficulty == 1 ? "Normal" : "Difícil"));
+    }
+
 }

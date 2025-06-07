@@ -18,6 +18,19 @@ public class EnemyHealth : MonoBehaviour
 
     void Start()
     {
+        // Ajustar la vida según dificultad
+        int dificultad = PlayerPrefs.GetInt("GameDifficulty", 1); // 0 = Fácil, 1 = Normal, 2 = Difícil
+
+        string dificultadTexto = dificultad == 0 ? "Fácil" : (dificultad == 2 ? "Difícil" : "Normal");
+        Debug.Log("Dificultad seleccionada: " + dificultadTexto);
+
+        switch (dificultad)
+        {
+            case 0: maxHealth = 50; break;   // Fácil
+            case 2: maxHealth = 150; break;  // Difícil
+            default: maxHealth = 100; break; // Normal
+        }
+
         currentHealth = maxHealth;
 
         if (healthCanvas != null)
@@ -29,6 +42,7 @@ public class EnemyHealth : MonoBehaviour
             healthSlider.value = currentHealth;
         }
     }
+
 
     void Update()
     {
