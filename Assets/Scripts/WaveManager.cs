@@ -157,8 +157,6 @@ public class WaveManager : MonoBehaviour
     public void ExitGame()
     {
         Time.timeScale = 1f;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         SceneManager.LoadScene("Menú Juego");
     }
 

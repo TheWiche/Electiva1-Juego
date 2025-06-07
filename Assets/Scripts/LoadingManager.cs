@@ -16,18 +16,20 @@ public class LoadingManager : MonoBehaviour
 
     [TextArea]
     public string[] consejos = {
-        "Usa W, A, S, D para moverte.",
+        "Usa W, A, S, D para moverte o apuntar.",
         "Presiona ESPACIO para saltar.",
         "Haz clic izquierdo para atacar.",
         "Haz clic derecho para bloquear.",
-        "Presiona ESC para pausar el juego.",
-        "Explora todos los rincones para encontrar secretos."
+        "Presiona ESC para pausar el juego."
     };
+
+    private AnimationCurve loadingCurve;
 
     public void StartGame()
     {
         mainMenuPanel.SetActive(false);
         loadingPanel.SetActive(true);
+        GenerateSmoothRandomCurve();
         StartCoroutine(LoadGameWithTips());
     }
 
@@ -42,7 +44,10 @@ public class LoadingManager : MonoBehaviour
         while (timer < fakeLoadingTime)
         {
             timer += Time.deltaTime;
-            loadingBarFill.fillAmount = timer / fakeLoadingTime;
+
+            float t = Mathf.Clamp01(timer / fakeLoadingTime);
+            float visualProgress = loadingCurve.Evaluate(t);
+            loadingBarFill.fillAmount = visualProgress;
 
             if (timer >= nextTipTime)
             {
@@ -54,5 +59,15 @@ public class LoadingManager : MonoBehaviour
         }
 
         SceneManager.LoadScene("Nivel1");
+    }
+
+    void GenerateSmoothRandomCurve()
+    {
+        loadingCurve = new AnimationCurve();
+
+        loadingCurve.AddKey(new Keyframe(0f, 0f, 0f, Random.Range(1f, 2f)));
+        loadingCurve.AddKey(new Keyframe(Random.Range(0.2f, 0.4f), Random.Range(0.3f, 0.6f), Random.Range(0.5f, 1.5f), Random.Range(0.5f, 1.5f)));
+        loadingCurve.AddKey(new Keyframe(Random.Range(0.6f, 0.8f), Random.Range(0.7f, 0.9f), Random.Range(0.5f, 1.5f), Random.Range(0.5f, 1.5f)));
+        loadingCurve.AddKey(new Keyframe(1f, 1f, Random.Range(1f, 2f), 0f));
     }
 }

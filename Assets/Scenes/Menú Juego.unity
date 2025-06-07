@@ -20851,11 +20851,11 @@ MonoBehaviour:
   tipsText: {fileID: 864418394}
   fakeLoadingTime: 6
   consejos:
-  - Usa W, A, S, D para moverte.
+  - Usa W, A, S, D para moverte y apuntar.
   - Presiona ESPACIO para saltar.
   - Haz clic izquierdo para atacar.
+  - Haz clic derecho para bloquear.
   - Presiona ESC para pausar el juego.
-  - Explora todos los rincones para encontrar secretos.
 --- !u!1 &1702507754
 GameObject:
   m_ObjectHideFlags: 0
