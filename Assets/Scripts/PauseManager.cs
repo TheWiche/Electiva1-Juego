@@ -23,6 +23,9 @@ public class PauseManager : MonoBehaviour
 
     private Resolution[] resolutions;
 
+    [Header("Other UI References")]
+    public GameObject congratulationsPanel;  // asignar en inspector el panel de felicitaciones
+
     void Start()
     {
         pauseMenu.SetActive(false);
@@ -43,6 +46,10 @@ public class PauseManager : MonoBehaviour
 
     void Update()
     {
+        // Si el panel de felicitaciones está activo, no permitir abrir pausa
+        if (WaveManager.instance != null && WaveManager.instance.IsGameCompleted)
+        return;
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (!isPaused)
@@ -58,6 +65,7 @@ public class PauseManager : MonoBehaviour
             }
         }
     }
+
 
     public void PauseGame()
     {
@@ -79,6 +87,12 @@ public class PauseManager : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    public void ResetGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Nivel1");
     }
 
     public void QuitGame()

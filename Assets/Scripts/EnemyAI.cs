@@ -17,6 +17,10 @@ public class EnemyAI : MonoBehaviour
     public float attackCooldown = 2.0f;
     public int damageAmount = 10;
 
+    [Header("Patrolling Settings")]
+    public float patrolRadius = 10f;
+    public float patrolWaitTime = 3f;
+
     private PlayerHealth playerHealth;
     private NavMeshAgent agent;
     private EnemyHealth enemyHealth;
@@ -26,6 +30,8 @@ public class EnemyAI : MonoBehaviour
     private bool hasAnimator;
     private float lastAttackTime;
     private bool isAttacking = false;
+
+    private float patrolTimer = 0f;
 
     void Awake()
     {
@@ -73,7 +79,6 @@ public class EnemyAI : MonoBehaviour
         lastAttackTime = -attackCooldown;
     }
 
-
     void Update()
     {
         if (!CanAct()) 
@@ -92,11 +97,14 @@ public class EnemyAI : MonoBehaviour
 
         if (distanceToPlayer <= lookRadius)
         {
+            // Perseguir jugador
+            patrolTimer = 0f;  // reset patrol timer
             MoveTowardsPlayer(distanceToPlayer);
         }
         else
         {
-            StopMovement();
+            // Patrullar
+            Patrol();
         }
 
         if (distanceToPlayer <= attackRange && Time.time >= lastAttackTime + attackCooldown)
@@ -127,6 +135,37 @@ public class EnemyAI : MonoBehaviour
         {
             FaceTarget();
         }
+    }
+
+    private void Patrol()
+    {
+        if (!agent.isOnNavMesh || isAttacking) return;
+
+        if (!agent.hasPath || agent.remainingDistance <= agent.stoppingDistance)
+        {
+            patrolTimer += Time.deltaTime;
+            if (patrolTimer >= patrolWaitTime)
+            {
+                Vector3 newPos = RandomNavSphere(transform.position, patrolRadius);
+                agent.SetDestination(newPos);
+                patrolTimer = 0f;
+            }
+        }
+        else
+        {
+            patrolTimer = 0f; // reset timer si sigue caminando
+        }
+    }
+
+    private Vector3 RandomNavSphere(Vector3 origin, float dist)
+    {
+        Vector3 randDirection = Random.insideUnitSphere * dist;
+        randDirection += origin;
+
+        NavMeshHit navHit;
+        NavMesh.SamplePosition(randDirection, out navHit, dist, NavMesh.AllAreas);
+
+        return navHit.position;
     }
 
     private void StopMovement()
@@ -221,5 +260,8 @@ public class EnemyAI : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, patrolRadius);
     }
 }
