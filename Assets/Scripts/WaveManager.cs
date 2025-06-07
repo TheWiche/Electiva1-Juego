@@ -10,21 +10,31 @@ public class WaveManager : MonoBehaviour
     {
         public string name;
         public GameObject enemyPrefab;
-        public int count;
+        public int baseCount;
         public float spawnRate;
+        public Transform[] spawnPoints; // <<--- Puntos de spawn específicos para esta wave
     }
 
     public List<Wave> waves;
-    public Transform[] spawnPoints;
     public float timeBetweenWaves = 5f;
-    public int enemiesPerLevelIncrease = 5; // Cuántos enemigos extra se añaden por nivel
 
     private int nextWave = 0;
     private int enemiesRemaining;
-    private int totalEnemiesKilledInLevel = 0;
-    private int currentLevel = 1;
+    private bool levelCompleted = false;
 
     public static WaveManager instance;
+
+    [Header("UI")]
+    public GameObject congratulationsPanel;
+    public GameObject nextButton;
+    public GameObject exitButton;
+
+    private enum Difficulty { Facil = 0, Normal = 1, Dificil = 2 }
+    private Difficulty selectedDifficulty;
+    private bool isWaitingForNextWave = false;
+
+    // Propiedad pública para que otros scripts sepan si el nivel ya terminó
+    public bool IsGameCompleted => levelCompleted;
 
     void Awake()
     {
@@ -34,6 +44,8 @@ public class WaveManager : MonoBehaviour
             return;
         }
         instance = this;
+
+        selectedDifficulty = (Difficulty)PlayerPrefs.GetInt("GameDifficulty", 1);
     }
 
     void Start()
@@ -44,17 +56,15 @@ public class WaveManager : MonoBehaviour
 
     void Update()
     {
-        if (enemiesRemaining <= 0 && nextWave > 0)
+        if (!levelCompleted && enemiesRemaining <= 0 && !isWaitingForNextWave)
         {
-            // Todos los enemigos de la ola actual han sido eliminados
             if (nextWave < waves.Count)
             {
                 StartCoroutine(WaveCompleted());
             }
             else
             {
-                // Todas las olas completadas para el nivel actual
-                CheckForLevelCompletion();
+                ShowCongratulationsPanel();
             }
         }
     }
@@ -67,74 +77,98 @@ public class WaveManager : MonoBehaviour
         }
     }
 
-    IEnumerator SpawnWave(Wave _wave)
+    IEnumerator SpawnWave(Wave wave)
     {
-        Debug.Log("Spawning Wave: " + _wave.name);
-        enemiesRemaining = _wave.count;
+        Debug.Log("Spawning Wave: " + wave.name);
 
-        for (int i = 0; i < _wave.count; i++)
+        int enemyCount = GetEnemyCountByDifficulty(wave.baseCount);
+        enemiesRemaining = enemyCount;
+
+        for (int i = 0; i < enemyCount; i++)
         {
-            SpawnEnemy(_wave.enemyPrefab);
-            yield return new WaitForSeconds(1f / _wave.spawnRate);
+            SpawnEnemy(wave.enemyPrefab, wave.spawnPoints);
+            yield return new WaitForSeconds(1f / wave.spawnRate);
         }
+
         nextWave++;
     }
 
-    void SpawnEnemy(GameObject _enemy)
+    void SpawnEnemy(GameObject enemy, Transform[] spawnPoints)
     {
-        if (spawnPoints.Length == 0)
+        if (spawnPoints == null || spawnPoints.Length == 0)
         {
-            Debug.LogError("No spawn points referenced.");
+            Debug.LogError("No spawn points set for this wave.");
             return;
         }
-        Transform _sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
-        Instantiate(_enemy, _sp.position, _sp.rotation);
+
+        Transform sp = spawnPoints[Random.Range(0, spawnPoints.Length)];
+        Instantiate(enemy, sp.position, sp.rotation);
     }
 
     public void EnemyDied()
     {
         enemiesRemaining--;
-        totalEnemiesKilledInLevel++;
         Debug.Log("Enemies remaining: " + enemiesRemaining);
     }
 
     IEnumerator WaveCompleted()
     {
+        isWaitingForNextWave = true;
         Debug.Log("Wave Completed! Next wave in " + timeBetweenWaves + " seconds.");
         yield return new WaitForSeconds(timeBetweenWaves);
         StartNextWave();
+        isWaitingForNextWave = false;
     }
 
-    void CheckForLevelCompletion()
+    void ShowCongratulationsPanel()
     {
-        Debug.Log("All waves completed for current level. Total enemies killed: " + totalEnemiesKilledInLevel);
+        if (levelCompleted) return;
+        levelCompleted = true;
 
-        if (currentLevel < 3) // Si hay más niveles para avanzar
+        StartCoroutine(ShowCongratulationsPanelDelayed());
+    }
+
+    IEnumerator ShowCongratulationsPanelDelayed()
+    {
+        // Espera 3 segundos en tiempo real para que las animaciones se terminen
+        yield return new WaitForSecondsRealtime(3f);
+
+        Time.timeScale = 0f;
+
+        if (congratulationsPanel != null)
         {
-            currentLevel++;
-            Debug.Log("Advancing to Level " + currentLevel);
-            // Guarda el estado si es necesario, por ejemplo, el número de nivel
-            PlayerPrefs.SetInt("CurrentLevel", currentLevel);
-            // Reinicia la cuenta de enemigos y la ola para el nuevo nivel
-            totalEnemiesKilledInLevel = 0;
-            nextWave = 0; // Reinicia las olas para el nuevo nivel
-            IncreaseEnemyCountForNextLevel();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Recarga la escena para el nuevo nivel
-        }
-        else
-        {
-            Debug.Log("All levels completed! You win!");
-            // Puedes cargar una escena de victoria o mostrar un mensaje
-            SceneManager.LoadScene("VictoryScene"); // Asume que tienes una escena de victoria
+            congratulationsPanel.SetActive(true);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            if (nextButton != null) nextButton.SetActive(true);
+            if (exitButton != null) exitButton.SetActive(true);
         }
     }
 
-    void IncreaseEnemyCountForNextLevel()
+    public void NextLevel()
     {
-        foreach (Wave wave in waves)
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        SceneManager.LoadScene("Nivel2");
+    }
+
+    public void ExitGame()
+    {
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        SceneManager.LoadScene("Menú Juego");
+    }
+
+    private int GetEnemyCountByDifficulty(int baseCount)
+    {
+        switch (selectedDifficulty)
         {
-            wave.count += enemiesPerLevelIncrease;
+            case Difficulty.Facil: return Mathf.RoundToInt(baseCount * 0.5f);
+            case Difficulty.Dificil: return Mathf.RoundToInt(baseCount * 1.5f);
+            default: return baseCount;
         }
     }
 }
-
