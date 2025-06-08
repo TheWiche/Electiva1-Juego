@@ -9,7 +9,7 @@ public class PlayerHealth : HealthSystem
     [Header("Scripts a Desactivar al Morir")]
     public MonoBehaviour[] scriptsToDisable;
 
-    public PlayerAttack playerAttack; // 👈 REFERENCIA AL SCRIPT DE ATAQUE
+    //public PlayerAttack playerAttack;
 
     public override void TakeDamage(float amount)
     {

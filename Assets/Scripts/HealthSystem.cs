@@ -7,7 +7,7 @@ public class HealthSystem : MonoBehaviour
     public float currentHealth;
 
     public UnityEvent<float> onHealthChanged; 
-    public UnityEvent onDied; 
+    private UnityEvent onDied; 
 
     public bool IsAlive { get; protected set; } 
 
