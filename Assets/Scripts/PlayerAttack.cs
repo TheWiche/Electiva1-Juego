@@ -10,6 +10,9 @@ public class PlayerAttack : MonoBehaviour
     public float attackRate = 2f;
     private float nextAttackTime = 0f;
 
+    public AudioSource audioSource;
+    public AudioClip hitSound; // <-- Sonido de golpe
+
     private int[] attackDamages = new int[] { 15, 20, 30 }; // Daño por animación
     private int currentAttackIndex;
 
@@ -38,23 +41,25 @@ public class PlayerAttack : MonoBehaviour
 
         foreach (Collider enemyCollider in hitEnemies)
         {
-            // 1. Verificar si el enemigo tiene EnemyHealth
             EnemyHealth enemyHealth = enemyCollider.GetComponent<EnemyHealth>();
             if (enemyHealth == null || !enemyHealth.IsAlive()) continue;
 
-            // 2. Verificar que el enemigo esté realmente cerca (usando el centro del jugador)
             float realDistance = Vector3.Distance(transform.position, enemyCollider.transform.position);
             if (realDistance > attackRange + 0.5f) continue;
 
-            // 3. Verificar que esté en la dirección frontal del jugador
             Vector3 dirToEnemy = (enemyCollider.transform.position - transform.position).normalized;
-            float dot = Vector3.Dot(transform.forward, dirToEnemy); // 1 = delante, 0 = lado, -1 = detrás
+            float dot = Vector3.Dot(transform.forward, dirToEnemy);
 
-            if (dot < 0.3f) continue; // Solo enemigos al frente (~72° de ángulo)
+            if (dot < 0.3f) continue;
 
-            // 4. Aplicar daño
             Debug.Log("Hit: " + enemyCollider.name);
             enemyHealth.TakeDamage(attackDamages[currentAttackIndex]);
+
+            // 🔊 Reproducir sonido de golpe
+            if (audioSource != null && hitSound != null)
+            {
+                audioSource.PlayOneShot(hitSound, 0.6f); // Volumen opcional
+            }
         }
     }
 
