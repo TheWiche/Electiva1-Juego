@@ -10,9 +10,16 @@ public class PlayerAttack : MonoBehaviour
     public float attackRate = 2f;
     private float nextAttackTime = 0f;
 
+<<<<<<< HEAD
     public bool canAttack = true; // 👈 NUEVO
 
     private int[] attackDamages = new int[] { 15, 20, 30 };
+=======
+    public AudioSource audioSource;
+    public AudioClip hitSound; // <-- Sonido de golpe
+
+    private int[] attackDamages = new int[] { 15, 20, 30 }; // Daño por animación
+>>>>>>> origin/main
     private int currentAttackIndex;
 
     void Update()
@@ -52,10 +59,22 @@ public class PlayerAttack : MonoBehaviour
 
             Vector3 dirToEnemy = (enemyCollider.transform.position - transform.position).normalized;
             float dot = Vector3.Dot(transform.forward, dirToEnemy);
+<<<<<<< HEAD
             if (dot < 0.3f) continue;
 
+=======
+
+            if (dot < 0.3f) continue;
+
+>>>>>>> origin/main
             Debug.Log("Hit: " + enemyCollider.name);
             enemyHealth.TakeDamage(attackDamages[currentAttackIndex]);
+
+            // 🔊 Reproducir sonido de golpe
+            if (audioSource != null && hitSound != null)
+            {
+                audioSource.PlayOneShot(hitSound, 0.6f); // Volumen opcional
+            }
         }
     }
 
