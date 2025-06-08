@@ -20,7 +20,6 @@ public class LoadingManager : MonoBehaviour
         "Usa W, A, S, D para moverte o apuntar.",
         "Presiona ESPACIO para saltar.",
         "Haz clic izquierdo para atacar.",
-        "Haz clic derecho para bloquear.",
         "Presiona ESC para pausar el juego."
     };
 

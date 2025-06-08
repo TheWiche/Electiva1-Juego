@@ -144,7 +144,7 @@ public class WaveManager : MonoBehaviour
 
     IEnumerator ShowCongratulationsPanelDelayed()
     {
-        yield return new WaitForSecondsRealtime(3f);
+        yield return new WaitForSecondsRealtime(1.25f);
         Time.timeScale = 0f;
 
         if (congratulationsPanel != null)
