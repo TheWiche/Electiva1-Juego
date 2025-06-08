@@ -12021,12 +12021,12 @@ MonoBehaviour:
     spawnPoints:
     - {fileID: 2083065256}
     - {fileID: 318815662}
+    - {fileID: 253167855}
   - name: SkeletonEnemy
     enemyPrefab: {fileID: 3697815431433840465, guid: 5a869588ac498ac4f8613ee67477e18e, type: 3}
     baseCount: 7
     spawnRate: 0.1
     spawnPoints:
-    - {fileID: 253167855}
     - {fileID: 435921841}
     - {fileID: 698401586}
   timeBetweenWaves: 5
@@ -52755,6 +52755,10 @@ PrefabInstance:
     - target: {fileID: 7487456215468429759, guid: e8600274ee647684487d341f141ef7e2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.6721301
+      objectReference: {fileID: 0}
+    - target: {fileID: 7487456215468429759, guid: e8600274ee647684487d341f141ef7e2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.3141973
       objectReference: {fileID: 0}
     - target: {fileID: 7487456215468429759, guid: e8600274ee647684487d341f141ef7e2, type: 3}
       propertyPath: m_LocalPosition.z

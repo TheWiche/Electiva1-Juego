@@ -54599,6 +54599,10 @@ PrefabInstance:
       propertyPath: 'scriptsToDisable.Array.data[1]'
       value: 
       objectReference: {fileID: 1966499490}
+    - target: {fileID: 4848137928748378703, guid: e8600274ee647684487d341f141ef7e2, type: 3}
+      propertyPath: onHealthChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 487872168}
     - target: {fileID: 6475793009243073977, guid: e8600274ee647684487d341f141ef7e2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.4229199
