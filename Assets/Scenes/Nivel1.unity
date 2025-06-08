@@ -52555,6 +52555,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Jugador
       objectReference: {fileID: 0}
+    - target: {fileID: 4847207535989417370, guid: e8600274ee647684487d341f141ef7e2, type: 3}
+      propertyPath: m_Volume
+      value: 0.3
+      objectReference: {fileID: 0}
     - target: {fileID: 5086772275029572769, guid: e8600274ee647684487d341f141ef7e2, type: 3}
       propertyPath: hurtSound
       value: 
@@ -52571,6 +52575,10 @@ PrefabInstance:
       propertyPath: onHealthChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 31025444}
+    - target: {fileID: 8234398534531100267, guid: e8600274ee647684487d341f141ef7e2, type: 3}
+      propertyPath: hitSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 11047752fdc87334fb34e86871ddf1b6, type: 3}
     - target: {fileID: 8684865588146829771, guid: e8600274ee647684487d341f141ef7e2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 4.25
