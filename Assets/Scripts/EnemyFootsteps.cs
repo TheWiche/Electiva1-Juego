@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class EnemyFootsteps : MonoBehaviour
 {
-    public AudioClip footstepClip;
+    public AudioClip[] footstepClips;
     private AudioSource audioSource;
 
     void Start()
@@ -13,13 +13,13 @@ public class EnemyFootsteps : MonoBehaviour
             Debug.LogWarning("No AudioSource found on " + gameObject.name);
         }
     }
-
+    
     public void PlayFootstep()
     {
-        if (footstepClip != null && audioSource != null)
+        if (footstepClips.Length > 0 && audioSource != null)
         {
-            audioSource.PlayOneShot(footstepClip);
+            AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
+            audioSource.PlayOneShot(clip);
         }
     }
-
 }

@@ -12,14 +12,15 @@ public class PlayerAttack : MonoBehaviour
     private float nextAttackTime = 0f;
 
     public AudioSource audioSource;
-    public AudioClip hitSound; // <-- Sonido de golpe
+    public AudioClip swingSound; // Sonido de corte al aire
+    public AudioClip hitSound;   // Sonido de impacto
 
     private int[] attackDamages = new int[] { 15, 20, 30 }; // Daño por animación
     private int currentAttackIndex;
 
     void Update()
     {
-        if (!canAttack) return; // 👈 BLOQUEO DE ATAQUE
+        if (!canAttack) return;
 
         if (Time.time >= nextAttackTime)
         {
@@ -33,11 +34,17 @@ public class PlayerAttack : MonoBehaviour
 
     void Attack()
     {
-        if (!canAttack) return;  // Bloqueo adicional para que no se dispare la animación si no puede atacar
+        if (!canAttack) return;
 
         currentAttackIndex = Random.Range(0, 2);
         animator.SetInteger("AttackIndex", currentAttackIndex);
         animator.SetTrigger("AttackTrigger");
+
+        // 🔊 Sonido de ataque (swing), incluso si no golpea
+        if (audioSource != null && swingSound != null)
+        {
+            audioSource.PlayOneShot(swingSound, 0.6f);
+        }
     }
 
     void PerformHitDetection()
@@ -54,16 +61,15 @@ public class PlayerAttack : MonoBehaviour
 
             Vector3 dirToEnemy = (enemyCollider.transform.position - transform.position).normalized;
             float dot = Vector3.Dot(transform.forward, dirToEnemy);
-
             if (dot < 0.3f) continue;
 
             Debug.Log("Hit: " + enemyCollider.name);
             enemyHealth.TakeDamage(attackDamages[currentAttackIndex]);
 
-            // 🔊 Reproducir sonido de golpe
+            // 🔊 Sonido de impacto (solo si golpea)
             if (audioSource != null && hitSound != null)
             {
-                audioSource.PlayOneShot(hitSound, 0.6f); // Volumen opcional
+                audioSource.PlayOneShot(hitSound, 0.8f);
             }
         }
     }
@@ -75,11 +81,9 @@ public class PlayerAttack : MonoBehaviour
         Gizmos.DrawWireSphere(attackPoint.position, attackRange);
     }
 
-    // 👇 MÉTODO PARA REACTIVAR ATAQUE DESDE LA ANIMACIÓN
     public void EnableAttack()
     {
         canAttack = true;
         Debug.Log("Ataque habilitado desde animación");
     }
-
 }

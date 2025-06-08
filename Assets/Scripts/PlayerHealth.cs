@@ -9,13 +9,29 @@ public class PlayerHealth : HealthSystem
     [Header("Scripts a Desactivar al Morir")]
     public MonoBehaviour[] scriptsToDisable;
 
-    //public PlayerAttack playerAttack;
+    [Header("Sonido de Daño")]
+    public AudioClip hurtSound;
+    private AudioSource audioSource;
+
+    void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            Debug.LogWarning("No se encontró AudioSource en el jugador.");
+    }
 
     public override void TakeDamage(float amount)
     {
         base.TakeDamage(amount);
         Debug.Log("Player received " + amount + " FLOAT DAMAGE. Remaining Health: " + currentHealth);
+
         PlayRandomHurtAnimation();
+
+        // 🔊 Reproducir sonido de daño
+        if (audioSource != null && hurtSound != null)
+        {
+            audioSource.PlayOneShot(hurtSound, 0.8f); // Puedes ajustar el volumen
+        }
     }
 
     public override void Heal(float amount)
@@ -39,7 +55,6 @@ public class PlayerHealth : HealthSystem
         animator.SetTrigger(triggerName);
         Debug.Log("Reproduciendo animación de daño: " + triggerName);
     }
-
 
     protected override void Die()
     {
