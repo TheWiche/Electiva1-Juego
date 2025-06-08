@@ -12,7 +12,7 @@ public class WaveManager : MonoBehaviour
         public GameObject enemyPrefab;
         public int baseCount;
         public float spawnRate;
-        public Transform[] spawnPoints; // <<--- Puntos de spawn específicos para esta wave
+        public Transform[] spawnPoints;
     }
 
     public List<Wave> waves;
@@ -20,6 +20,7 @@ public class WaveManager : MonoBehaviour
 
     private int nextWave = 0;
     private int enemiesRemaining;
+    private int enemiesInCurrentWave; // 👈 Total en la oleada actual
     private bool levelCompleted = false;
 
     public static WaveManager instance;
@@ -28,12 +29,12 @@ public class WaveManager : MonoBehaviour
     public GameObject congratulationsPanel;
     public GameObject nextButton;
     public GameObject exitButton;
+    public RoundInfoUI roundInfoUI; // 👈 Asignar en el Inspector
 
     private enum Difficulty { Facil = 0, Normal = 1, Dificil = 2 }
     private Difficulty selectedDifficulty;
     private bool isWaitingForNextWave = false;
 
-    // Propiedad pública para que otros scripts sepan si el nivel ya terminó
     public bool IsGameCompleted => levelCompleted;
 
     void Awake()
@@ -83,6 +84,14 @@ public class WaveManager : MonoBehaviour
 
         int enemyCount = GetEnemyCountByDifficulty(wave.baseCount);
         enemiesRemaining = enemyCount;
+        enemiesInCurrentWave = enemyCount; // 👈
+
+        // 👇 Actualizar UI de ronda
+        if (roundInfoUI != null)
+        {
+            roundInfoUI.UpdateRound(nextWave + 1, waves.Count);
+            roundInfoUI.UpdateEnemies(enemiesRemaining, enemiesInCurrentWave);
+        }
 
         for (int i = 0; i < enemyCount; i++)
         {
@@ -109,6 +118,11 @@ public class WaveManager : MonoBehaviour
     {
         enemiesRemaining--;
         Debug.Log("Enemies remaining: " + enemiesRemaining);
+
+        if (roundInfoUI != null)
+        {
+            roundInfoUI.UpdateEnemies(enemiesRemaining, enemiesInCurrentWave); // 👈
+        }
     }
 
     IEnumerator WaveCompleted()
@@ -130,9 +144,7 @@ public class WaveManager : MonoBehaviour
 
     IEnumerator ShowCongratulationsPanelDelayed()
     {
-        // Espera 3 segundos en tiempo real para que las animaciones se terminen
         yield return new WaitForSecondsRealtime(3f);
-
         Time.timeScale = 0f;
 
         if (congratulationsPanel != null)

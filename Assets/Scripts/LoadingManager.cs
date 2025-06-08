@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LoadingManager : MonoBehaviour
 {
@@ -24,12 +25,17 @@ public class LoadingManager : MonoBehaviour
     };
 
     private AnimationCurve loadingCurve;
+    private List<string> tipsPool; // Consejos únicos para esta carga
 
     public void StartGame()
     {
         mainMenuPanel.SetActive(false);
         loadingPanel.SetActive(true);
         GenerateSmoothRandomCurve();
+
+        // Crear nueva copia de consejos para esta carga
+        tipsPool = new List<string>(consejos);
+
         StartCoroutine(LoadGameWithTips());
     }
 
@@ -38,8 +44,9 @@ public class LoadingManager : MonoBehaviour
         float timer = 0f;
         float tipChangeInterval = 2f;
         float nextTipTime = 0f;
+        float lastProgress = 0f;
 
-        tipsText.text = consejos[Random.Range(0, consejos.Length)];
+        tipsText.text = GetNextUniqueTip();
 
         while (timer < fakeLoadingTime)
         {
@@ -47,18 +54,35 @@ public class LoadingManager : MonoBehaviour
 
             float t = Mathf.Clamp01(timer / fakeLoadingTime);
             float visualProgress = loadingCurve.Evaluate(t);
-            loadingBarFill.fillAmount = visualProgress;
 
-            if (timer >= nextTipTime)
+            // Evitar retroceso de la barra
+            if (visualProgress > lastProgress)
+            {
+                loadingBarFill.fillAmount = visualProgress;
+                lastProgress = visualProgress;
+            }
+
+            if (timer >= nextTipTime && tipsPool.Count > 0)
             {
                 nextTipTime += tipChangeInterval;
-                tipsText.text = consejos[Random.Range(0, consejos.Length)];
+                tipsText.text = GetNextUniqueTip();
             }
 
             yield return null;
         }
 
         SceneManager.LoadScene("Nivel1");
+    }
+
+    string GetNextUniqueTip()
+    {
+        if (tipsPool.Count == 0) return "";
+
+        int index = Random.Range(0, tipsPool.Count);
+        string selectedTip = tipsPool[index];
+        tipsPool.RemoveAt(index); // Eliminar para no repetir
+
+        return selectedTip;
     }
 
     void GenerateSmoothRandomCurve()
