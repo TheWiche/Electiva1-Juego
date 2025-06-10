@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class PauseManager : MonoBehaviour
 {
@@ -21,10 +22,10 @@ public class PauseManager : MonoBehaviour
     private bool isPaused = false;
     private bool inOptions = false;
 
-    private Resolution[] resolutions;
-
     [Header("Other UI References")]
-    public GameObject congratulationsPanel;  // asignar en inspector el panel de felicitaciones
+    public GameObject congratulationsPanel;
+
+    private List<Resolution> filteredResolutions = new List<Resolution>();
 
     void Start()
     {
@@ -46,33 +47,22 @@ public class PauseManager : MonoBehaviour
 
     void Update()
     {
-        // Si el panel de felicitaciones está activo, no permitir abrir pausa
         if (WaveManager.instance != null && WaveManager.instance.IsGameCompleted)
-        return;
+            return;
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!isPaused)
-            {
-                PauseGame();
-            }
-            else
-            {
-                if (inOptions)
-                    BackFromOptions();
-                else
-                    ResumeGame();
-            }
+            if (!isPaused) PauseGame();
+            else if (inOptions) BackFromOptions();
+            else ResumeGame();
         }
     }
-
 
     public void PauseGame()
     {
         isPaused = true;
         pauseMenu.SetActive(true);
         Time.timeScale = 0f;
-
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
@@ -84,7 +74,6 @@ public class PauseManager : MonoBehaviour
         pauseMenu.SetActive(false);
         optionsPanel.SetActive(false);
         Time.timeScale = 1f;
-
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -129,65 +118,86 @@ public class PauseManager : MonoBehaviour
     private void PopulateResolutionDropdown()
     {
         resolutionDropdown.ClearOptions();
-        resolutions = Screen.resolutions;
-        var options = new System.Collections.Generic.List<string>();
-        int currentIndex = 0;
+        filteredResolutions.Clear();
+        List<string> options = new List<string>();
 
-        int savedWidth = PlayerPrefs.GetInt("resolutionWidth", Screen.currentResolution.width);
+        int savedWidth  = PlayerPrefs.GetInt("resolutionWidth",  Screen.currentResolution.width);
         int savedHeight = PlayerPrefs.GetInt("resolutionHeight", Screen.currentResolution.height);
 
-        for (int i = 0; i < resolutions.Length; i++)
+        int matchedIndex = 0;
+        for (int i = 0; i < Screen.resolutions.Length; i++)
         {
-            Resolution res = resolutions[i];
-            string option = res.width + "x" + res.height;
-            options.Add(option);
+            var res = Screen.resolutions[i];
+            if (!filteredResolutions.Exists(r => r.width == res.width && r.height == res.height))
+            {
+                filteredResolutions.Add(res);
+                options.Add(res.width + "x" + res.height);
 
-            if (res.width == savedWidth && res.height == savedHeight)
-                currentIndex = i;
+                if (res.width == savedWidth && res.height == savedHeight)
+                    matchedIndex = filteredResolutions.Count - 1;
+            }
         }
 
         resolutionDropdown.AddOptions(options);
-        resolutionDropdown.value = currentIndex;
+        // No guardamos aquí: solo inicializamos visualmente
+        resolutionDropdown.value = matchedIndex;
         resolutionDropdown.RefreshShownValue();
     }
 
     private void LoadSettingsIntoUI()
     {
-        resolutionDropdown.value = PlayerPrefs.GetInt("resolutionIndex", 0);
-        fullscreenToggle.isOn = PlayerPrefs.GetInt("fullscreen", 1) == 1;
-        volumeSlider.value = PlayerPrefs.GetFloat("volume", 1f);
+        int resolutionIndex = PlayerPrefs.GetInt("resolutionIndex", 0);
+        resolutionDropdown.value        = Mathf.Clamp(resolutionIndex, 0, filteredResolutions.Count - 1);
+        resolutionDropdown.RefreshShownValue();
+
+        fullscreenToggle.isOn           = PlayerPrefs.GetInt("fullscreen", 1) == 1;
+        volumeSlider.value              = PlayerPrefs.GetFloat("volume", 1f);
     }
 
     private void ApplyCurrentSettings()
     {
-        OnResolutionChanged(PlayerPrefs.GetInt("resolutionIndex", 0));
-        OnFullscreenChanged(fullscreenToggle.isOn);
-        OnVolumeChanged(volumeSlider.value);
+        int  resolutionIndex = PlayerPrefs.GetInt("resolutionIndex", 0);
+        bool isFullscreen    = PlayerPrefs.GetInt("fullscreen", 1) == 1;
+        float volume         = PlayerPrefs.GetFloat("volume", 1f);
+
+        ApplyResolution(resolutionIndex, isFullscreen);
+        Screen.fullScreen = isFullscreen;
+        AudioListener.volume = volume;
     }
 
     public void OnResolutionChanged(int index)
     {
-        Resolution selected = resolutions[index];
+        if (index < 0 || index >= filteredResolutions.Count) return;
+
+        var selected = filteredResolutions[index];
         Screen.SetResolution(selected.width, selected.height, fullscreenToggle.isOn);
 
-        PlayerPrefs.SetInt("resolutionIndex", index);
-        PlayerPrefs.SetInt("resolutionWidth", selected.width);
+        PlayerPrefs.SetInt("resolutionIndex",  index);
+        PlayerPrefs.SetInt("resolutionWidth",  selected.width);
         PlayerPrefs.SetInt("resolutionHeight", selected.height);
         PlayerPrefs.Save();
     }
 
     public void OnFullscreenChanged(bool isFullscreen)
     {
-        Screen.fullScreen = isFullscreen;
         PlayerPrefs.SetInt("fullscreen", isFullscreen ? 1 : 0);
         PlayerPrefs.Save();
+        Screen.fullScreen = isFullscreen;
+        ApplyResolution(resolutionDropdown.value, isFullscreen);
     }
 
     public void OnVolumeChanged(float volume)
     {
-        AudioListener.volume = volume;
         PlayerPrefs.SetFloat("volume", volume);
         PlayerPrefs.Save();
+        AudioListener.volume = volume;
+    }
+
+    private void ApplyResolution(int index, bool fullscreen)
+    {
+        if (index < 0 || index >= filteredResolutions.Count) return;
+        var sel = filteredResolutions[index];
+        Screen.SetResolution(sel.width, sel.height, fullscreen);
     }
 
     #endregion

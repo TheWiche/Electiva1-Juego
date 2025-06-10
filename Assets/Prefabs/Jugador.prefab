@@ -1634,7 +1634,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   canAttack: 1
   animator: {fileID: 1340059375064223550}
-  attackPoint: {fileID: 6154722678307967659}
+  attackPoint: {fileID: 0}
   attackRange: 1.5
   enemyLayers:
     serializedVersion: 2
@@ -1774,6 +1774,7 @@ MonoBehaviour:
   scriptsToDisable:
   - {fileID: 5500815822388297491}
   - {fileID: 0}
+  hurtSound: {fileID: 0}
 --- !u!1 &2053617824525923983
 GameObject:
   m_ObjectHideFlags: 0
@@ -2392,93 +2393,6 @@ Transform:
   - {fileID: 7599661125998627281}
   m_Father: {fileID: 1205061193215797227}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2493296826035057054
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3025258537768263297}
-  - component: {fileID: 8958696589607309376}
-  - component: {fileID: 3748656926572770954}
-  m_Layer: 0
-  m_Name: EspadaKokiriportafolio
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &3025258537768263297
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2493296826035057054}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.042187594, y: 0.062445775, z: -0.14814256, w: 0.98609054}
-  m_LocalPosition: {x: 0.249, y: 0.177, z: 1.882}
-  m_LocalScale: {x: 6, y: 6, z: 6}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 6154722678307967659}
-  m_Father: {fileID: 5284524775745070591}
-  m_LocalEulerAnglesHint: {x: -176.29, y: -172.187, z: 162.659}
---- !u!33 &8958696589607309376
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2493296826035057054}
-  m_Mesh: {fileID: -5495902117074765545, guid: 2bd2a801f5a90b009998b2a5e78bbdca, type: 3}
---- !u!23 &3748656926572770954
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2493296826035057054}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: -876546973899608171, guid: 2bd2a801f5a90b009998b2a5e78bbdca, type: 3}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &2765140338315240728
 GameObject:
   m_ObjectHideFlags: 0
@@ -9039,41 +8953,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3025258537768263297}
   - {fileID: 8046934626086580284}
   m_Father: {fileID: 1803777986523305826}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &7811312397570525409
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6154722678307967659}
-  m_Layer: 0
-  m_Name: SwordAttackPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6154722678307967659
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7811312397570525409}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.603532, y: -0.5806713, z: 0.530344, w: 0.1315492}
-  m_LocalPosition: {x: -0.114, y: 0.047, z: 0.114}
-  m_LocalScale: {x: 0.1666667, y: 0.16666669, z: 0.16666661}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3025258537768263297}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -6.97}
 --- !u!1 &7812791991107492518
 GameObject:
   m_ObjectHideFlags: 0
