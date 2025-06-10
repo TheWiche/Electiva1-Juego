@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
 {
-    public bool canAttack = true;  
+    public bool canAttack = true;
     public Animator animator;
     public Transform attackPoint;
     public float attackRange = 0.7f;
@@ -12,41 +12,50 @@ public class PlayerAttack : MonoBehaviour
     private float nextAttackTime = 0f;
 
     public AudioSource audioSource;
-    public AudioClip swingSound; // Sonido de corte al aire
-    public AudioClip hitSound;   // Sonido de impacto
+    public AudioClip swingSound;
+    public AudioClip hitSound;
 
-    private int[] attackDamages = new int[] { 15, 20, 30 }; // Daño por animación
+    private int[] attackDamages = new int[] { 15, 20, 30 };
     private int currentAttackIndex;
 
     void Update()
     {
         if (!canAttack) return;
 
-        if (Time.time >= nextAttackTime)
+        // Activar/desactivar bloqueo
+        if (Input.GetMouseButtonDown(1))
         {
-            if (Input.GetKeyDown(KeyCode.Q) || Input.GetMouseButtonDown(0))
-            {
-                Attack();
-                nextAttackTime = Time.time + 1f / attackRate;
-            }
+            animator.SetBool("IsBlocking", true);
+        }
+        else if (Input.GetMouseButtonUp(1))
+        {
+            animator.SetBool("IsBlocking", false);
+        }
+
+        if (animator.GetBool("IsBlocking")) return;
+
+        if (Input.GetMouseButtonDown(0) && Time.time >= nextAttackTime)
+        {
+            StartAttack();
         }
     }
 
-    void Attack()
+    void StartAttack()
     {
-        if (!canAttack) return;
-
         currentAttackIndex = Random.Range(0, 2);
         animator.SetInteger("AttackIndex", currentAttackIndex);
-        animator.SetTrigger("AttackTrigger");
+        animator.SetBool("IsAttacking", true);
 
-        // 🔊 Sonido de ataque (swing), incluso si no golpea
+        nextAttackTime = Time.time + 1f / attackRate;
+
+        // 🔊 Sonido de ataque
         if (audioSource != null && swingSound != null)
         {
             audioSource.PlayOneShot(swingSound, 0.6f);
         }
     }
 
+    // Debe llamarse mediante un Animation Event
     void PerformHitDetection()
     {
         Collider[] hitEnemies = Physics.OverlapSphere(attackPoint.position, attackRange, enemyLayers);
@@ -66,7 +75,6 @@ public class PlayerAttack : MonoBehaviour
             Debug.Log("Hit: " + enemyCollider.name);
             enemyHealth.TakeDamage(attackDamages[currentAttackIndex]);
 
-            // 🔊 Sonido de impacto (solo si golpea)
             if (audioSource != null && hitSound != null)
             {
                 audioSource.PlayOneShot(hitSound, 0.8f);
@@ -83,6 +91,7 @@ public class PlayerAttack : MonoBehaviour
 
     public void EnableAttack()
     {
+        animator.SetBool("IsAttacking", false);
         canAttack = true;
         Debug.Log("Ataque habilitado desde animación");
     }

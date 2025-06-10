@@ -207,14 +207,13 @@ public class EnemyAI : MonoBehaviour
 
     public void ApplyDamageToPlayer()
     {
-        if (playerTarget == null || playerHealth == null) 
+        if (playerTarget == null || playerHealth == null)
         {
             EndAttack();
             return;
         }
 
         float distanceToPlayer = Vector3.Distance(playerTarget.position, transform.position);
-
         if (distanceToPlayer > attackRange)
         {
             Debug.Log("Enemy attack missed: player out of range.");
@@ -222,6 +221,24 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
+        // Bloqueo frontal
+        Animator playerAnimator = playerTarget.GetComponent<Animator>();
+        if (playerAnimator != null && playerAnimator.GetBool("IsBlocking"))
+        {
+            Vector3 directionToEnemy = (transform.position - playerTarget.position).normalized;
+            float angle = Vector3.Angle(playerTarget.forward, directionToEnemy);
+
+            if (angle <= 50f) // Dentro del cono de bloqueo frontal (100° total)
+            {
+                Debug.Log("Player blocked the attack!");
+                // Si deseas reducir daño, puedes hacer:
+                // playerHealth.TakeDamage(damageAmount / 2);
+                EndAttack();
+                return;
+            }
+        }
+
+        // No bloqueado o fuera del ángulo
         if (playerHealth.IsAlive)
         {
             playerHealth.TakeDamage(damageAmount);
@@ -234,6 +251,7 @@ public class EnemyAI : MonoBehaviour
 
         EndAttack();
     }
+
 
     private void EndAttack()
     {
