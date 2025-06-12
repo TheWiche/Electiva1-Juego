@@ -1458,6 +1458,8 @@ MonoBehaviour:
   SprintSpeed: 5.335
   RotationSmoothTime: 0.12
   SpeedChangeRate: 10
+  sfxAudioSource: {fileID: 4847207535989417370}
+  sfxMixerGroup: {fileID: 2382603812176611269, guid: b40d01327d86e9844a4bed961be24773, type: 2}
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips:
   - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
@@ -1652,7 +1654,7 @@ AudioSource:
   m_GameObject: {fileID: 1936513620878928306}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 2382603812176611269, guid: b40d01327d86e9844a4bed961be24773, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0

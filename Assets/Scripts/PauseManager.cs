@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using UnityEngine.Audio;
 
 public class PauseManager : MonoBehaviour
 {
@@ -17,7 +18,13 @@ public class PauseManager : MonoBehaviour
     [Header("Options UI")]
     public Dropdown resolutionDropdown;
     public Toggle fullscreenToggle;
-    public Slider volumeSlider;
+
+    [Header("Volume Sliders")]
+    public Slider musicVolumeSlider = null;
+    public Slider sfxVolumeSlider = null;
+
+    [Header("Audio")]
+    public AudioMixer mainMixer;
 
     private bool isPaused = false;
     private bool inOptions = false;
@@ -112,8 +119,10 @@ public class PauseManager : MonoBehaviour
     {
         resolutionDropdown.onValueChanged.AddListener(OnResolutionChanged);
         fullscreenToggle.onValueChanged.AddListener(OnFullscreenChanged);
-        volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+        musicVolumeSlider.onValueChanged.AddListener(OnMusicVolumeChanged);
+        sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
     }
+
 
     private void PopulateResolutionDropdown()
     {
@@ -149,20 +158,23 @@ public class PauseManager : MonoBehaviour
         int resolutionIndex = PlayerPrefs.GetInt("resolutionIndex", 0);
         resolutionDropdown.value        = Mathf.Clamp(resolutionIndex, 0, filteredResolutions.Count - 1);
         resolutionDropdown.RefreshShownValue();
-
         fullscreenToggle.isOn           = PlayerPrefs.GetInt("fullscreen", 1) == 1;
-        volumeSlider.value              = PlayerPrefs.GetFloat("volume", 1f);
+        musicVolumeSlider.value         = PlayerPrefs.GetFloat("musicVolume", 1f);
+        sfxVolumeSlider.value           = PlayerPrefs.GetFloat("sfxVolume", 1f);
+
     }
 
     private void ApplyCurrentSettings()
     {
         int  resolutionIndex = PlayerPrefs.GetInt("resolutionIndex", 0);
         bool isFullscreen    = PlayerPrefs.GetInt("fullscreen", 1) == 1;
-        float volume         = PlayerPrefs.GetFloat("volume", 1f);
+        float musicVolume = PlayerPrefs.GetFloat("musicVolume", 1f);
+        float sfxVolume   = PlayerPrefs.GetFloat("sfxVolume", 1f);
 
         ApplyResolution(resolutionIndex, isFullscreen);
         Screen.fullScreen = isFullscreen;
-        AudioListener.volume = volume;
+        mainMixer.SetFloat("musicVolume", Mathf.Log10(Mathf.Max(musicVolume, 0.0001f)) * 20f);
+        mainMixer.SetFloat("sfxVolume", Mathf.Log10(Mathf.Max(sfxVolume, 0.0001f)) * 20f);
     }
 
     public void OnResolutionChanged(int index)
@@ -186,12 +198,22 @@ public class PauseManager : MonoBehaviour
         ApplyResolution(resolutionDropdown.value, isFullscreen);
     }
 
-    public void OnVolumeChanged(float volume)
+    public void OnMusicVolumeChanged(float volume)
     {
-        PlayerPrefs.SetFloat("volume", volume);
+        float volumeInDb = Mathf.Log10(Mathf.Max(volume, 0.0001f)) * 20f;
+        mainMixer.SetFloat("musicVolume", volumeInDb);
+        PlayerPrefs.SetFloat("musicVolume", volume);
         PlayerPrefs.Save();
-        AudioListener.volume = volume;
     }
+
+    public void OnSFXVolumeChanged(float volume)
+    {
+        float volumeInDb = Mathf.Log10(Mathf.Max(volume, 0.0001f)) * 20f;
+        mainMixer.SetFloat("sfxVolume", volumeInDb);
+        PlayerPrefs.SetFloat("sfxVolume", volume);
+        PlayerPrefs.Save();
+    }
+
 
     private void ApplyResolution(int index, bool fullscreen)
     {
