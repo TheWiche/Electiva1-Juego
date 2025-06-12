@@ -42,6 +42,10 @@ public class PlayerAttack : MonoBehaviour
 
     void StartAttack()
     {
+        // Verifica si ya está en animación de ataque
+        if (animator.GetBool("IsAttacking"))
+            return;
+
         currentAttackIndex = Random.Range(0, 2);
         animator.SetInteger("AttackIndex", currentAttackIndex);
         animator.SetBool("IsAttacking", true);

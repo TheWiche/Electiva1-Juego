@@ -1060,6 +1060,14 @@ MonoBehaviour:
   damageAmount: 10
   patrolRadius: 10
   patrolWaitTime: 3
+  audioSource: {fileID: 2416898205908503632}
+  swingSound: {fileID: 8300000, guid: f74532fa880920444a44cf5672c43273, type: 3}
+  hitSound: {fileID: 8300000, guid: 4b7b0406b1899724690371e9632714ed, type: 3}
+  blockSounds:
+  - {fileID: 8300000, guid: 746ba5070cfdc6544b6cf97d7d9957a7, type: 3}
+  - {fileID: 8300000, guid: 277a77d326382b742beb2023e2cbaa2b, type: 3}
+  - {fileID: 8300000, guid: 3899a022d41c30b48bff882f49eb3fb3, type: 3}
+  - {fileID: 8300000, guid: 32149c7e563582f4281a66bf983e8927, type: 3}
 --- !u!136 &237107547794783399
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1096,7 +1104,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
-  m_Volume: 0.55
+  m_Volume: 1
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -1193,7 +1201,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   footstepClips:
-  - {fileID: 8300000, guid: eaae8fe8d600e1f459f34aa5757fa3b8, type: 3}
+  - {fileID: 8300000, guid: 0161bf22bab84e441a3a3eaf6fa3982f, type: 3}
+  - {fileID: 8300000, guid: d73ff9eb1f24dc040b34aa81e369026f, type: 3}
+  - {fileID: 8300000, guid: 09c27d2f2c51cb04da01137d87cf9ff7, type: 3}
 --- !u!1 &4514363719333744920
 GameObject:
   m_ObjectHideFlags: 0

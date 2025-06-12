@@ -10,7 +10,7 @@ public class EnemyAI : MonoBehaviour
     public float stoppingDistance = 1.5f;
 
     [Header("Player Reference (Lo encuentra automaticamente)")]
-    public Transform playerTarget;  // 🔴 Se asigna manualmente en el Inspector
+    public Transform playerTarget; 
 
     [Header("Attack Settings")]
     public float attackRange = 2.0f;
@@ -20,6 +20,12 @@ public class EnemyAI : MonoBehaviour
     [Header("Patrolling Settings")]
     public float patrolRadius = 10f;
     public float patrolWaitTime = 3f;
+
+    [Header("Audio Settings")]
+    public AudioSource audioSource;
+    public AudioClip swingSound; 
+    public AudioClip hitSound; 
+    public AudioClip[] blockSounds;
 
     private PlayerHealth playerHealth;
     private NavMeshAgent agent;
@@ -195,6 +201,12 @@ public class EnemyAI : MonoBehaviour
         lastAttackTime = Time.time;
         agent.isStopped = true;
 
+        // 🔊 Reproducir sonido de ataque
+        if (audioSource != null && swingSound != null)
+        {
+            audioSource.PlayOneShot(swingSound, 0.6f);
+        }
+
         if (hasAnimator)
         {
             animator.SetTrigger("Attack");
@@ -204,6 +216,7 @@ public class EnemyAI : MonoBehaviour
             ApplyDamageToPlayer();
         }
     }
+
 
     public void ApplyDamageToPlayer()
     {
@@ -231,19 +244,30 @@ public class EnemyAI : MonoBehaviour
             if (angle <= 50f) // Dentro del cono de bloqueo frontal (100° total)
             {
                 Debug.Log("Player blocked the attack!");
-                // Si deseas reducir daño, puedes hacer:
-                // playerHealth.TakeDamage(damageAmount / 2);
+
+                // 🔊 Reproducir sonido de bloqueo
+                if (audioSource != null && blockSounds.Length > 0)
+                {
+                    int index = Random.Range(0, blockSounds.Length);
+                    audioSource.PlayOneShot(blockSounds[index], 0.8f);
+                }
+
                 EndAttack();
                 return;
             }
         }
 
-        // No bloqueado o fuera del ángulo
         if (playerHealth.IsAlive)
+    {
+        playerHealth.TakeDamage(damageAmount);
+        Debug.Log("Enemy dealt damage to the player.");
+
+        // 🔊 Sonido de impacto exitoso
+        if (audioSource != null && hitSound != null)
         {
-            playerHealth.TakeDamage(damageAmount);
-            Debug.Log("Enemy dealt damage to the player.");
+            audioSource.PlayOneShot(hitSound, 0.8f);
         }
+    }
         else
         {
             Debug.Log("Enemy tried to damage player, but player is already dead.");
