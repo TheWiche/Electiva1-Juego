@@ -4595,6 +4595,7 @@ MonoBehaviour:
   nextButton: {fileID: 0}
   exitButton: {fileID: 411275954}
   roundInfoUI: {fileID: 1966499492}
+  playerHealth: {fileID: 1351880081}
 --- !u!4 &143061026
 Transform:
   m_ObjectHideFlags: 0
@@ -54567,6 +54568,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 900310557902530776, guid: e8600274ee647684487d341f141ef7e2, type: 3}
   m_PrefabInstance: {fileID: 1351880079}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1351880081 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5086772275029572769, guid: e8600274ee647684487d341f141ef7e2, type: 3}
+  m_PrefabInstance: {fileID: 1351880079}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 962400111455d8240b22b09b42a0cd58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1352095519
 PrefabInstance:
   m_ObjectHideFlags: 0

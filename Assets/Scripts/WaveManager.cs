@@ -36,6 +36,7 @@ public class WaveManager : MonoBehaviour
     private bool isWaitingForNextWave = false;
 
     public bool IsGameCompleted => levelCompleted;
+    public PlayerHealth playerHealth;
 
     void Awake()
     {
@@ -129,9 +130,50 @@ public class WaveManager : MonoBehaviour
     {
         isWaitingForNextWave = true;
         Debug.Log("Wave Completed! Next wave in " + timeBetweenWaves + " seconds.");
+        // 🧠 Curar al jugador al finalizar una ronda
+        if (playerHealth != null)
+        {
+            float healAmount = GetHealAmountByDifficulty();
+            StartCoroutine(HealPlayerOverTime(healAmount, 1.5f)); 
+        }
         yield return new WaitForSeconds(timeBetweenWaves);
         StartNextWave();
         isWaitingForNextWave = false;
+    }
+
+    IEnumerator HealPlayerOverTime(float totalAmount, float duration)
+    {
+        if (playerHealth == null) yield break;
+
+        float elapsed = 0f;
+        float currentHealed = 0f;
+        float rate = totalAmount / duration;
+
+        while (elapsed < duration)
+        {
+            float delta = rate * Time.deltaTime;
+            playerHealth.Heal(delta);
+            currentHealed += delta;
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Asegura que se aplique el total exacto
+        if (currentHealed < totalAmount)
+        {
+            playerHealth.Heal(totalAmount - currentHealed);
+        }
+    }
+
+
+    private float GetHealAmountByDifficulty()
+    {
+        switch (selectedDifficulty)
+        {
+            case Difficulty.Facil: return 30f;   // Cura más
+            case Difficulty.Dificil: return 10f; // Cura poco
+            default: return 20f;                // Normal
+        }
     }
 
     void ShowCongratulationsPanel()
