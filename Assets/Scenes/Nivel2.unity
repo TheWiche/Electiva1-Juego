@@ -4561,7 +4561,7 @@ MonoBehaviour:
   waves:
   - name: SkeletonEnemy
     enemyPrefab: {fileID: 4442375239203661343, guid: 5a869588ac498ac4f8613ee67477e18e, type: 3}
-    baseCount: 3
+    baseCount: 4
     spawnRate: 0.25
     spawnPoints:
     - {fileID: 646427946}
@@ -4570,7 +4570,7 @@ MonoBehaviour:
     - {fileID: 754677105}
   - name: SkeletonEnemy
     enemyPrefab: {fileID: 4442375239203661343, guid: 5a869588ac498ac4f8613ee67477e18e, type: 3}
-    baseCount: 5
+    baseCount: 6
     spawnRate: 0.23
     spawnPoints:
     - {fileID: 271005204}
@@ -4579,7 +4579,7 @@ MonoBehaviour:
     - {fileID: 627388408}
   - name: SkeletonEnemy
     enemyPrefab: {fileID: 4442375239203661343, guid: 5a869588ac498ac4f8613ee67477e18e, type: 3}
-    baseCount: 8
+    baseCount: 10
     spawnRate: 0.2
     spawnPoints:
     - {fileID: 1573337012}

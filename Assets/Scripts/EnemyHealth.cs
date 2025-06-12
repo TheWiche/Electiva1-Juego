@@ -111,7 +111,7 @@ public class EnemyHealth : MonoBehaviour
             healthCanvas.gameObject.SetActive(false);
 
         // Destruir después de un retardo
-        Destroy(gameObject, 10f);
+        Destroy(gameObject, 60f);
     }
 
     private System.Collections.IEnumerator DisableAnimatorAfterDelay(float delay)
