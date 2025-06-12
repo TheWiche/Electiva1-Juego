@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class EnemyFootsteps : MonoBehaviour
 {
+    [Header("Footstep Settings")]
     public AudioClip[] footstepClips;
+    public float stepCooldown = 0.3f;
+
     private AudioSource audioSource;
+    private float lastStepTime = 0f;
 
     void Start()
     {
@@ -13,13 +17,18 @@ public class EnemyFootsteps : MonoBehaviour
             Debug.LogWarning("No AudioSource found on " + gameObject.name);
         }
     }
-    
+
     public void PlayFootstep()
     {
-        if (footstepClips.Length > 0 && audioSource != null)
+        if (footstepClips.Length > 0 && audioSource != null && Time.time - lastStepTime >= stepCooldown)
         {
+            lastStepTime = Time.time;
+
             AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
-            audioSource.PlayOneShot(clip);
+            Debug.Log("Playing footstep clip: " + clip.name);
+
+            audioSource.clip = clip;
+            audioSource.Play();
         }
     }
 }

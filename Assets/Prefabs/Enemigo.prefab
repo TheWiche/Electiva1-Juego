@@ -1202,8 +1202,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   footstepClips:
   - {fileID: 8300000, guid: 0161bf22bab84e441a3a3eaf6fa3982f, type: 3}
-  - {fileID: 8300000, guid: d73ff9eb1f24dc040b34aa81e369026f, type: 3}
   - {fileID: 8300000, guid: 09c27d2f2c51cb04da01137d87cf9ff7, type: 3}
+  stepCooldown: 0.22
 --- !u!1 &4514363719333744920
 GameObject:
   m_ObjectHideFlags: 0
@@ -2369,6 +2369,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   footstepClips: []
+  stepCooldown: 0.3
 --- !u!223 &3629859267908710736
 Canvas:
   m_ObjectHideFlags: 0
