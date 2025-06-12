@@ -93,14 +93,14 @@ public class PlayerHealth : HealthSystem
     {
         if (!IsAlive) return;
 
-        if (Input.GetKeyDown(KeyCode.H))
-        {
-            TakeDamage(10f);
-        }
+        //if (Input.GetKeyDown(KeyCode.H))
+        //{
+        //    TakeDamage(10f);
+        //}
 
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            Heal(5f);
-        }
+        //if (Input.GetKeyDown(KeyCode.J))
+        //{
+        //    Heal(5f);
+        //}
     }
 }
